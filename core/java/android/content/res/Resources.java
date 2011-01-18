@@ -1359,7 +1359,6 @@ public class Resources {
                     }
                 }
             }
-            mDrawableCache.clear();
             mColorStateListCache.clear();
             flushLayoutCache();
         }
@@ -1761,7 +1760,7 @@ public class Resources {
                 } else {
                     synchronized (mTmpValue) {
                         //Log.i(TAG, "Saving cached drawable @ #" +
-                        //        Integer.toHexString(key.intValue())
+                        //        Long.toHexString(key)
                         //        + " in " + this + ": " + cs);
                         mDrawableCache.put(key, new WeakReference<Drawable.ConstantState>(cs));
                     }
@@ -1779,7 +1778,7 @@ public class Resources {
                 Drawable.ConstantState entry = wr.get();
                 if (entry != null) {
                     //Log.i(TAG, "Returning cached drawable @ #" +
-                    //        Integer.toHexString(((Integer)key).intValue())
+                    //        Long.toHexString(key)
                     //        + " in " + this + ": " + entry);
                     return entry.newDrawable(this);
                 }
@@ -1863,7 +1862,7 @@ public class Resources {
             } else {
                 synchronized (mTmpValue) {
                     //Log.i(TAG, "Saving cached color state list @ #" +
-                    //        Integer.toHexString(key.intValue())
+                    //        Long.toHexString(key)
                     //        + " in " + this + ": " + csl);
                     mColorStateListCache.put(
                         key, new WeakReference<ColorStateList>(csl));
@@ -1881,7 +1880,7 @@ public class Resources {
                 ColorStateList entry = wr.get();
                 if (entry != null) {
                     //Log.i(TAG, "Returning cached color state list @ #" +
-                    //        Integer.toHexString(((Integer)key).intValue())
+                    //        Long.toHexString(key)
                     //        + " in " + this + ": " + entry);
                     return entry;
                 }
