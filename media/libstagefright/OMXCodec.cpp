@@ -867,11 +867,11 @@ status_t OMXCodec::findTargetColorFormat(
 
     *colorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
     int32_t targetColorFormat;
-    if (meta->findInt32(kKeyColorFormat, &targetColorFormat)) {
-        *colorFormat = (OMX_COLOR_FORMATTYPE) targetColorFormat;
+    if (!strcasecmp("OMX.TI.Video.encoder", mComponentName)) {
+        *colorFormat = OMX_COLOR_FormatYCbYCr;
     } else {
-        if (!strcasecmp("OMX.TI.Video.encoder", mComponentName)) {
-            *colorFormat = OMX_COLOR_FormatYCbYCr;
+        if (meta->findInt32(kKeyColorFormat, &targetColorFormat)) {
+            *colorFormat = (OMX_COLOR_FORMATTYPE) targetColorFormat;
         }
     }
 
