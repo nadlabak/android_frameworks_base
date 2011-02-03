@@ -34,7 +34,7 @@ public class StorageNotification extends StorageEventListener {
     private static final String TAG = "StorageNotification";
 
     private static final boolean POP_UMS_ACTIVITY_ON_CONNECT = false;
-    private static final boolean UMS_NOTIFICATION_VISIBLE = false
+    private static final boolean UMS_NOTIFICATION_VISIBLE = false;
 
     /**
      * Binder context for this service
