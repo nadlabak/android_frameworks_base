@@ -23,6 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.util.Slog;
 import android.util.Log;
 import android.view.View;
@@ -199,14 +200,18 @@ public class StatusBarIconView extends AnimatedImageView {
 
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         if (mNumberBackground != null) {
-            float numberX = mNumberX;
             mNumberBackground.draw(canvas);
             if(!mIcon.hasBackground) {
+                float numberX = mNumberX;
+                Paint hdpiPaint = new Paint(mNumberPain);
                 numberX *= 0.83F;
+                hdpiPaint.setTypeface(Typeface.DEFAULT_BOLD);
+                hdpiPaint.setTextSize(17);
+                canvas.drawText(mNumberText, numberX, mNumberY, hdpiPaint);
+            } else {
+                canvas.drawText(mNumberText, mNumberX, mNumberY, mNumberPain);
             }
-            canvas.drawText(mNumberText, numberX, mNumberY, mNumberPain);
         }
     }
 
