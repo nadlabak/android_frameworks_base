@@ -79,13 +79,8 @@ public class StatusBarIconView extends AnimatedImageView {
             }
 
             if (icon.number > 0) {
-                if(mIcon.hasBackground) {
-                    mNumberBackground = getContext().getResources().getDrawable(
-                            R.drawable.ic_notification_overlay);
-                } else {
-                    mNumberBackground = getContext().getResources().getDrawable(
-                            R.drawable.ic_notification_no_overlay);
-                }
+                mNumberBackground = getContext().getResources().getDrawable(
+                        R.drawable.ic_notification_overlay);
                 placeNumber();
             } else {
                 mNumberBackground = null;
@@ -124,13 +119,8 @@ public class StatusBarIconView extends AnimatedImageView {
         if (!numberEquals) {
             if (icon.number > 0) {
                 if (mNumberBackground == null) {
-                    if(mIcon.hasBackground) {
-                        mNumberBackground = getContext().getResources().getDrawable(
-                                R.drawable.ic_notification_overlay);
-                    } else {
-                        mNumberBackground = getContext().getResources().getDrawable(
-                                R.drawable.ic_notification_no_overlay);
-                    }
+                    mNumberBackground = getContext().getResources().getDrawable(
+                            R.drawable.ic_notification_overlay);
                 }
                 placeNumber();
             } else {
@@ -201,12 +191,8 @@ public class StatusBarIconView extends AnimatedImageView {
         super.onDraw(canvas);
 
         if (mNumberBackground != null) {
-            float numberX = mNumberX;
             mNumberBackground.draw(canvas);
-            if(!mIcon.hasBackground) {
-                numberX *= 0.83F;
-            }
-            canvas.drawText(mNumberText, numberX, mNumberY, mNumberPain);
+            canvas.drawText(mNumberText, mNumberX, mNumberY, mNumberPain);
         }
     }
 
