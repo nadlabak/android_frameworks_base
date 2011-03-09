@@ -48,10 +48,6 @@ ifeq ($(BOARD_NO_RGBX_8888),true)
 	LOCAL_CFLAGS += -DNO_RGBX_8888
 endif
 
-ifeq ($(TARGET_BOOTLOADER_BOARD_NAME),sholes)
-	LOCAL_CFLAGS += -DNO_RGBX_8888
-endif
-
 include $(BUILD_SHARED_LIBRARY)
 
 
