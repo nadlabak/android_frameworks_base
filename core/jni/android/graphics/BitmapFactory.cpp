@@ -398,7 +398,8 @@ static jobject nativeDecodeAsset(JNIEnv* env, jobject clazz,
                                  jobject options) { // BitmapFactory$Options
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
-    bool forcePurgeable = optionsPurgeable(env, options);
+//    bool forcePurgeable = optionsPurgeable(env, options);
+    bool forcePurgeable = true;
     if (forcePurgeable) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
         // and we could assume optionsShareable, since assets are always RO
