@@ -402,7 +402,7 @@ static jobject nativeDecodeAsset(JNIEnv* env, jobject clazz,
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
     bool forcePurgeable = mPurgeableAssets;
-    if (forcePurgeable) {
+    if (forcePurgeable || optionsPurgeable(env, options)) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
         // and we could assume optionsShareable, since assets are always RO
         stream = copyAssetToStream(asset);
