@@ -570,7 +570,7 @@ int register_android_graphics_BitmapFactory(JNIEnv* env) {
     gFileDescriptor_descriptor = getFieldIDCheck(env, gFileDescriptor_class, "descriptor", "I");
 
     char value[PROPERTY_VALUE_MAX];
-    property_get("persist.sys.purgeable_assets", value, "1");
+    property_get("persist.sys.purgeable_assets", value, "0");
     mPurgeableAssets = atoi(value) == 1;
 
     int ret = AndroidRuntime::registerNativeMethods(env,
