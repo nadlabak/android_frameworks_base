@@ -236,6 +236,14 @@ struct egl_context_t : public egl_object_t
       cnx(cnx), version(version)
     {
     }
+    ~egl_context_t() {
+        egl_surface_t::Ref _r(read);
+        egl_surface_t::Ref _d(draw);
+
+        // Drop our reference on the read and draw surfaces.
+        _r.release();
+        _d.release();
+    }
     EGLDisplay                  dpy;
     EGLContext                  context;
     EGLConfig                   config;
