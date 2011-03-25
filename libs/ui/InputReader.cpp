@@ -23,6 +23,7 @@
 #define DEBUG_POINTER_ASSIGNMENT 0
 
 #include <cutils/log.h>
+#include <cutils/properties.h>
 #include <ui/InputReader.h>
 
 #include <stddef.h>
@@ -70,6 +71,7 @@ static inline const char* toString(bool value) {
     return value ? "true" : "false";
 }
 
+int mVolKeySwapOffset = 2;
 
 int32_t updateMetaState(int32_t keyCode, bool down, int32_t oldMetaState) {
     int32_t mask;
@@ -114,13 +116,15 @@ static const int32_t keyCodeRotationMap[][4] = {
         { AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN },
         { AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT },
         { AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP },
+        { AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN,   AKEYCODE_VOLUME_DOWN,  AKEYCODE_VOLUME_UP },
+        { AKEYCODE_VOLUME_DOWN,   AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_UP,  AKEYCODE_VOLUME_DOWN },
 };
 static const int keyCodeRotationMapSize =
         sizeof(keyCodeRotationMap) / sizeof(keyCodeRotationMap[0]);
 
 int32_t rotateKeyCode(int32_t keyCode, int32_t orientation) {
     if (orientation != InputReaderPolicyInterface::ROTATION_0) {
-        for (int i = 0; i < keyCodeRotationMapSize; i++) {
+        for (int i = 0; i < keyCodeRotationMapSize - mVolKeySwapOffset; i++) {
             if (keyCode == keyCodeRotationMap[i][0]) {
                 return keyCodeRotationMap[i][orientation];
             }
@@ -450,6 +454,11 @@ void InputReader::updateInputConfiguration() {
         mInputConfiguration.touchScreen = touchScreenConfig;
         mInputConfiguration.keyboard = keyboardConfig;
         mInputConfiguration.navigation = navigationConfig;
+
+        char value[PROPERTY_VALUE_MAX];
+        property_get("persist.sys.volbtn_orient_swap", value, "0");
+        mVolKeySwapOffset = atoi(value) == 1 ? 0 : 2;
+
     } // release state lock
 }
 
