@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.os.UEventObserver;
 import android.provider.Settings;
 import android.server.BluetoothService;
@@ -68,6 +69,7 @@ class DockObserver extends UEventObserver {
 
     @Override
     public void onUEvent(UEventObserver.UEvent event) {
+        if ("1".equals(SystemProperties.get("sys.persist.dock_observer_off", "0"))) return;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Slog.v(TAG, "Dock UEVENT: " + event.toString());
         }
