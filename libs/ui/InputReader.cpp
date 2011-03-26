@@ -112,19 +112,19 @@ int32_t updateMetaState(int32_t keyCode, bool down, int32_t oldMetaState) {
 static const int32_t keyCodeRotationMap[][4] = {
         // key codes enumerated counter-clockwise with the original (unrotated) key first
         // no rotation,        90 degree rotation,  180 degree rotation, 270 degree rotation
+        { AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_UP },
+        { AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN },
         { AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT },
         { AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN },
         { AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT },
         { AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP },
-        { AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN,   AKEYCODE_VOLUME_DOWN,  AKEYCODE_VOLUME_UP },
-        { AKEYCODE_VOLUME_DOWN,   AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_UP,  AKEYCODE_VOLUME_DOWN },
 };
 static const int keyCodeRotationMapSize =
         sizeof(keyCodeRotationMap) / sizeof(keyCodeRotationMap[0]);
 
 int32_t rotateKeyCode(int32_t keyCode, int32_t orientation) {
     if (orientation != InputReaderPolicyInterface::ROTATION_0) {
-        for (int i = 0; i < keyCodeRotationMapSize - mVolKeySwapOffset; i++) {
+        for (int i = mVolKeySwapOffset; i < keyCodeRotationMapSize; i++) {
             if (keyCode == keyCodeRotationMap[i][0]) {
                 return keyCodeRotationMap[i][orientation];
             }
