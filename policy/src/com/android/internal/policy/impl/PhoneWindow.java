@@ -1206,7 +1206,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     Intent intent = new Intent(Intent.ACTION_CAMERA_BUTTON, null);
                     intent.putExtra(Intent.EXTRA_KEY_EVENT, event);
                     getContext().sendOrderedBroadcast(intent, null);
-                    dispatcher.reset(this);
                 }
                 return true;
             }
