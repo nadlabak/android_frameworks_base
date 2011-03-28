@@ -387,11 +387,7 @@ bool SurfaceFlinger::threadLoop()
 
     if (LIKELY(mTransactionCount == 0)) {
         // if we're in a global transaction, don't do anything.
-        const uint32_t mask = eTransactionNeeded | eTraversalNeeded;
-        uint32_t transactionFlags = getTransactionFlags(mask);
-        if (LIKELY(transactionFlags)) {
-            handleTransaction(transactionFlags);
-        }
+        handleTransaction();
     }
 
     // post surfaces (if needed)
@@ -491,7 +487,7 @@ void SurfaceFlinger::handleConsoleEvents()
     mDirtyRegion.set(hw.bounds());
 }
 
-void SurfaceFlinger::handleTransaction(uint32_t transactionFlags)
+void SurfaceFlinger::handleTransaction()
 {
     Vector< sp<LayerBase> > ditchedLayers;
 
@@ -500,12 +496,17 @@ void SurfaceFlinger::handleTransaction(uint32_t transactionFlags)
      */
 
     { // scope for the lock
+        const uint32_t mask = eTransactionNeeded | eTraversalNeeded;
+
         Mutex::Autolock _l(mStateLock);
-        const nsecs_t now = systemTime();
-        mDebugInTransaction = now;
-        handleTransactionLocked(transactionFlags, ditchedLayers);
-        mLastTransactionTime = systemTime() - now;
-        mDebugInTransaction = 0;
+        uint32_t transactionFlags = getTransactionFlags(mask);
+        if (LIKELY(transactionFlags)) {
+            const nsecs_t now = systemTime();
+            mDebugInTransaction = now;
+            handleTransactionLocked(transactionFlags, ditchedLayers);
+            mLastTransactionTime = systemTime() - now;
+            mDebugInTransaction = 0;
+        }
         // here the transaction has been committed
     }
 

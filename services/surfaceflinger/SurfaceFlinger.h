@@ -299,7 +299,7 @@ public:     // hack to work around gcc 4.0.3 bug
             void        signalEvent();
 private:
             void        handleConsoleEvents();
-            void        handleTransaction(uint32_t transactionFlags);
+            void        handleTransaction();
             void        handleTransactionLocked(
                             uint32_t transactionFlags, 
                             Vector< sp<LayerBase> >& ditchedLayers);
