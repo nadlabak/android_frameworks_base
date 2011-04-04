@@ -69,7 +69,7 @@ class DockObserver extends UEventObserver {
 
     @Override
     public void onUEvent(UEventObserver.UEvent event) {
-        if ("1".equals(SystemProperties.get("sys.persist.dock_observer_off", "0"))) return;
+        if ("1".equals(SystemProperties.get("persist.sys.dock_observer_off", "0"))) return;
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Slog.v(TAG, "Dock UEVENT: " + event.toString());
         }
