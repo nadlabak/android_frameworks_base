@@ -417,7 +417,7 @@ class PowerManagerService extends IPowerManager.Stub
                     // turn on.  Some devices want this because they don't have a
                     // charging LED.
                     synchronized (mLocks) {
-                        if ("0".equals(SystemProperties.get("persist.sys.no_action_on_plug", "0") &&
+                        if ("0".equals(SystemProperties.get("persist.sys.no_action_on_plug", "0")) &&
                                 (!wasPowered || (mPowerState & SCREEN_ON_BIT) != 0 ||
                                 mUnplugTurnsOnScreen)) {
                             forceUserActivityLocked();
