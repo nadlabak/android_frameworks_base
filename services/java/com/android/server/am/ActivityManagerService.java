@@ -347,6 +347,10 @@ public final class ActivityManagerService extends ActivityManagerNative
     // We put empty content processes after any hidden processes that have
     // been idle for less than 120 seconds.
     static final long EMPTY_APP_IDLE_OFFSET = 120*1000;
+
+    // Apps to be kept running, defined by sys.keep_app_1 & _2 properties
+    static final String KEEP_APP_1;
+    static final String KEEP_APP_2;
     
     static int getIntProp(String name, boolean allowZero) {
         String str = SystemProperties.get(name);
@@ -382,6 +386,9 @@ public final class ActivityManagerService extends ActivityManagerNative
         HOME_APP_MEM = getIntProp("ro.HOME_APP_MEM", false)*PAGE_SIZE;
         HIDDEN_APP_MEM = getIntProp("ro.HIDDEN_APP_MEM", false)*PAGE_SIZE;
         EMPTY_APP_MEM = getIntProp("ro.EMPTY_APP_MEM", false)*PAGE_SIZE;
+
+        KEEP_APP_1 = SystemProperties.get("sys.keep_app_1", "0");
+        KEEP_APP_2 = SystemProperties.get("sys.keep_app_2", "0");
     }
     
     static final int MY_PID = Process.myPid();
@@ -11559,6 +11566,11 @@ public final class ActivityManagerService extends ActivityManagerNative
             adj = FOREGROUND_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
             app.adjType = "mms";
+        } else if (KEEP_APP_1.equals(app.processName) || KEEP_APP_2.equals(app.processName)) {
+            // apps to be kept running
+            adj = FOREGROUND_APP_ADJ;
+            schedGroup = Process.THREAD_GROUP_DEFAULT;
+            app.adjType = "foreground-service";
         } else if (app == TOP_APP) {
             // The last app on the list is the foreground app.
             adj = FOREGROUND_APP_ADJ;
