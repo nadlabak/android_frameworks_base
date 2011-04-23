@@ -169,7 +169,9 @@ static const CodecInfo kDecoderInfo[] = {
     { MEDIA_MIMETYPE_AUDIO_AMR_WB, "OMX.TI.WBAMR.decode" },
     { MEDIA_MIMETYPE_AUDIO_AMR_WB, "AMRWBDecoder" },
 //    { MEDIA_MIMETYPE_AUDIO_AMR_WB, "OMX.PV.amrdec" },
+#ifndef USE_SOFTWARE_AUDIO_AAC
     { MEDIA_MIMETYPE_AUDIO_AAC, "OMX.Nvidia.aac.decoder" },
+#endif
     { MEDIA_MIMETYPE_AUDIO_AAC, "OMX.TI.AAC.decode" },
     { MEDIA_MIMETYPE_AUDIO_AAC, "AACDecoder" },
 //    { MEDIA_MIMETYPE_AUDIO_AAC, "OMX.PV.aacdec" },
@@ -1129,8 +1131,6 @@ status_t OMXCodec::getVideoProfileLevel(
         CodecProfileLevel &profileLevel) {
     CODEC_LOGV("Default profile: %ld, level %ld",
             defaultProfileLevel.mProfile, defaultProfileLevel.mLevel);
-
-    return OK;
 
     // Are the default profile and level overwriten?
     int32_t profile, level;
