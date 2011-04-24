@@ -85,6 +85,8 @@ public final class SIMRecords extends IccRecords {
     // Numeric network codes listed in TS 51.011 EF[SPDI]
     ArrayList<String> spdiNetworks = null;
 
+    boolean forcePlmnDisplay = false;
+
     String pnnHomeName = null;
 
     // ***** Constants
@@ -1357,7 +1359,7 @@ public final class SIMRecords extends IccRecords {
             rule = SPN_RULE_SHOW_PLMN;
         } else if (isOnMatchingPlmn(plmn)) {
             rule = SPN_RULE_SHOW_SPN;
-            if ((spnDisplayCondition & 0x01) == 0x01) {
+            if ((spnDisplayCondition & 0x01) == 0x01 || forcePlmnDisplay) {
                 // ONS required when registered to HPLMN or PLMN in EF_SPDI
                 rule |= SPN_RULE_SHOW_PLMN;
             }
@@ -1378,12 +1380,14 @@ public final class SIMRecords extends IccRecords {
         if (plmn == null) return false;
 
         if (plmn.equals(getSIMOperatorNumeric())) {
+            forcePlmnDisplay = false;
             return true;
         }
 
         if (spdiNetworks != null) {
             for (String spdiNet : spdiNetworks) {
                 if (plmn.equals(spdiNet)) {
+                    forcePlmnDisplay = true;
                     return true;
                 }
             }
