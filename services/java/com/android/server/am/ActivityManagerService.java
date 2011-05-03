@@ -3432,7 +3432,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             }
             if (mPendingBroadcast != null && mPendingBroadcast.curApp.pid == pid) {
                 Slog.w(TAG, "Unattached app died before broadcast acknowledged, skipping");
-                mPendingBroadcast.state = BroadcastRecord.IDLE;
+                mPendingBroadcast.finishReceiver();
                 mPendingBroadcast.nextReceiver = mPendingBroadcastRecvIndex;
                 mPendingBroadcast = null;
                 scheduleBroadcastsLocked();
@@ -3629,11 +3629,8 @@ public final class ActivityManagerService extends ActivityManagerNative
                       + br.curComponent.flattenToShortString(), e);
                 badApp = true;
                 logBroadcastReceiverDiscardLocked(br);
-                finishReceiverLocked(br.receiver, br.resultCode, br.resultData,
-                        br.resultExtras, br.resultAbort, true);
+                br.finishReceiver();
                 scheduleBroadcastsLocked();
-                // We need to reset the state if we fails to start the receiver.
-                br.state = BroadcastRecord.IDLE;
             }
         }
 
@@ -10586,30 +10583,14 @@ public final class ActivityManagerService extends ActivityManagerNative
             return false;
         }
         int state = r.state;
-        r.state = r.IDLE;
         if (state == r.IDLE) {
             if (explicit) {
                 Slog.w(TAG, "finishReceiver called but state is IDLE");
             }
         }
-        r.receiver = null;
-        r.intent.setComponent(null);
-        if (r.curApp != null) {
-            r.curApp.curReceiver = null;
-        }
-        if (r.curFilter != null) {
-            r.curFilter.receiverList.curBroadcast = null;
-        }
-        r.curFilter = null;
-        r.curApp = null;
-        r.curComponent = null;
-        r.curReceiver = null;
-        mPendingBroadcast = null;
 
-        r.resultCode = resultCode;
-        r.resultData = resultData;
-        r.resultExtras = resultExtras;
-        r.resultAbort = resultAbort;
+        mPendingBroadcast = null;
+        r.finishReceiver(resultCode, resultData, resultExtras, resultAbort);
 
         // We will process the next receiver right now if this is finishing
         // an app receiver (which is always asynchronous) or after we have
@@ -10766,8 +10747,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         }
 
         // Move on to the next receiver.
-        finishReceiverLocked(r.receiver, r.resultCode, r.resultData,
-                r.resultExtras, r.resultAbort, true);
+        r.finishReceiver();
         scheduleBroadcastsLocked();
 
         if (anrMessage != null) {
@@ -11099,7 +11079,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                     // process the next one.
                     if (DEBUG_BROADCAST) Slog.v(TAG, "Quick finishing: ordered="
                             + r.ordered + " receiver=" + r.receiver);
-                    r.state = BroadcastRecord.IDLE;
+                    r.finishReceiver();
                     scheduleBroadcastsLocked();
                 }
                 return;
@@ -11156,9 +11136,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             if (skip) {
                 if (DEBUG_BROADCAST)  Slog.v(TAG,
                         "Skipping delivery of ordered " + r + " for whatever reason");
-                r.receiver = null;
-                r.curFilter = null;
-                r.state = BroadcastRecord.IDLE;
+                r.finishReceiver();
                 scheduleBroadcastsLocked();
                 return;
             }
@@ -11202,10 +11180,8 @@ public final class ActivityManagerService extends ActivityManagerNative
                         + info.activityInfo.applicationInfo.uid + " for broadcast "
                         + r.intent + ": process is bad");
                 logBroadcastReceiverDiscardLocked(r);
-                finishReceiverLocked(r.receiver, r.resultCode, r.resultData,
-                        r.resultExtras, r.resultAbort, true);
+                r.finishReceiver();
                 scheduleBroadcastsLocked();
-                r.state = BroadcastRecord.IDLE;
                 return;
             }
 

@@ -73,6 +73,30 @@ class BroadcastRecord extends Binder {
     ComponentName curComponent; // the receiver class that is currently running.
     ActivityInfo curReceiver;   // info about the receiver that is currently running.
 
+    void finishReceiver() {
+        state = IDLE;
+        receiver = null;
+        intent.setComponent(null);
+        if (curApp != null) {
+            curApp.curReceiver = null;
+        }
+        if (curFilter != null) {
+            curFilter.receiverList.curBroadcast = null;
+        }
+        curFilter = null;
+        curApp = null;
+        curComponent = null;
+        curReceiver = null;
+    }
+
+    void finishReceiver(int code, String data, Bundle extras, boolean abort) {
+        finishReceiver();
+        resultCode = code;
+        resultData = data;
+        resultExtras = extras;
+        resultAbort = abort;
+    }
+
     void dump(PrintWriter pw, String prefix) {
         final long now = SystemClock.uptimeMillis();
 
