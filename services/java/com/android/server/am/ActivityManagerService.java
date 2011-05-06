@@ -11561,7 +11561,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         int N;
         if ("com.android.mms".equals(app.processName) &&
             Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.LOCK_MMS_IN_MEMORY, 0) == 1 ) {
+            Settings.System.LOCK_MMS_IN_MEMORY, 1) == 1 ) {
             // MMS can die in situations of heavy memory pressure.
             // Always push it to the top.
             adj = FOREGROUND_APP_ADJ;
@@ -11615,7 +11615,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             // This process is hosting what we currently consider to be the
             // home app, so we don't want to let it go into the background.
             adj =  Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.LOCK_HOME_IN_MEMORY, 0) == 1 ? VISIBLE_APP_ADJ : HOME_APP_ADJ;
+                    Settings.System.LOCK_HOME_IN_MEMORY, 1) == 1 ? VISIBLE_APP_ADJ : HOME_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_BG_NONINTERACTIVE;
             app.adjType = "home";
         } else if ((N=app.activities.size()) != 0) {
