@@ -93,6 +93,12 @@ public final class AttributeCache {
             }
         }
     }
+
+    public void clearCache() {
+        synchronized (this) {
+                mPackages.clear();
+        }
+    }
     
     public Entry get(String packageName, int resId, int[] styleable) {
         synchronized (this) {

@@ -19,6 +19,7 @@ package com.android.server;
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.app.ShutdownThread;
 import com.android.server.am.BatteryStatsService;
+import com.android.server.AttributeCache;
 
 import android.app.ActivityManagerNative;
 import android.app.IActivityManager;
@@ -1689,6 +1690,11 @@ class PowerManagerService extends IPowerManager.Stub
                     mHighestLightSensorValue = -1;
                     lightFilterStop();
                     resetLastLightValues();
+                    AttributeCache ac = AttributeCache.instance();
+                    if (ac != null) {
+                        ac.clearCache();
+                        Slog.w(TAG, "AttributeCache cleared");
+                    }
                 }
             }
         }
