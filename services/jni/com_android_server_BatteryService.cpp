@@ -18,6 +18,7 @@
 
 #include "JNIHelp.h"
 #include "jni.h"
+#include <cutils/properties.h>
 #include <utils/Log.h>
 #include <utils/misc.h>
 
@@ -178,6 +179,11 @@ static void setIntField(JNIEnv* env, jobject obj, const char* path, jfieldID fie
     if (readFromFile(path, buf, SIZE) > 0) {
         value = atoi(buf);
     }
+
+    /* when using charge_counter, the reported value can get over 100%
+       when connected to usb, let's limit it here */
+    if (fieldID == gFieldIds.mBatteryLevel && value > 100) value = 100;
+
     env->SetIntField(obj, fieldID, value);
 }
 
@@ -228,6 +234,10 @@ static JNINativeMethod sMethods[] = {
 
 int register_android_server_BatteryService(JNIEnv* env)
 {
+    char value[PROPERTY_VALUE_MAX];
+    property_get("persist.sys.one_percent_batt", value, "0");
+    bool mOnePercentBatt = atoi(value) == 1;
+
     char    path[PATH_MAX];
     struct dirent* entry;
 
@@ -272,7 +282,9 @@ int register_android_server_BatteryService(JNIEnv* env)
                 snprintf(path, sizeof(path), "%s/%s/present", POWER_SUPPLY_PATH, name);
                 if (access(path, R_OK) == 0)
                     gPaths.batteryPresentPath = strdup(path);
-                snprintf(path, sizeof(path), "%s/%s/capacity", POWER_SUPPLY_PATH, name);
+                if (mOnePercentBatt)
+                    snprintf(path, sizeof(path), "%s/%s/charge_counter", POWER_SUPPLY_PATH, name);
+                else snprintf(path, sizeof(path), "%s/%s/capacity", POWER_SUPPLY_PATH, name);
                 if (access(path, R_OK) == 0)
                     gPaths.batteryCapacityPath = strdup(path);
 
