@@ -204,6 +204,7 @@ public class StorageNotification extends StorageEventListener {
              */
             Intent intent = new Intent();
             intent.setClass(mContext, com.android.internal.app.ExternalMediaFormatActivity.class);
+            intent.putExtra("path", path);
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, intent, 0);
 
             setMediaStorageNotification(
@@ -218,6 +219,7 @@ public class StorageNotification extends StorageEventListener {
              */
             Intent intent = new Intent();
             intent.setClass(mContext, com.android.internal.app.ExternalMediaFormatActivity.class);
+            intent.putExtra("path", path);
             PendingIntent pi = PendingIntent.getActivity(mContext, 0, intent, 0);
 
             setMediaStorageNotification(
