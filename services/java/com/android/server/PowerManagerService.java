@@ -2142,9 +2142,10 @@ class PowerManagerService extends IPowerManager.Stub
                  (mElectronBeamAnimationOn && (int)curValue == Power.BRIGHTNESS_OFF));
             if (mAnimateScreenLights || !electrifying) {
                 synchronized (mLocks) {
+                    long now = SystemClock.uptimeMillis();
                     boolean more = mScreenBrightness.stepLocked();
                     if (more) {
-                        mScreenOffHandler.postDelayed(this, 1000/60);
+                        mScreenOffHandler.postAtTime(this, now+(1000/60));
                     }
                 }
             } else {
