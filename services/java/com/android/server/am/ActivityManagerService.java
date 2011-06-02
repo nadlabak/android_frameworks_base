@@ -11606,12 +11606,12 @@ public final class ActivityManagerService extends ActivityManagerNative
             app.adjType = "exec-service";
         } else if (app.foregroundServices) {
             // The user is aware of this app, so make it visible.
-            adj = PERCEPTIBLE_APP_ADJ;
+            adj = VISIBLE_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
             app.adjType = "foreground-service";
         } else if (app.forcingToForeground != null) {
             // The user is aware of this app, so make it visible.
-            adj = PERCEPTIBLE_APP_ADJ;
+            adj = VISIBLE_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
             app.adjType = "force-foreground";
             app.adjSource = app.forcingToForeground;
