@@ -179,11 +179,6 @@ static void setIntField(JNIEnv* env, jobject obj, const char* path, jfieldID fie
     if (readFromFile(path, buf, SIZE) > 0) {
         value = atoi(buf);
     }
-
-    /* when using charge_counter, the reported value can get over 100%
-       when connected to usb, let's limit it here */
-    if (fieldID == gFieldIds.mBatteryLevel && value > 100) value = 100;
-
     env->SetIntField(obj, fieldID, value);
 }
 
