@@ -945,6 +945,7 @@ public final class Settings {
          *
          * @return The setting's current value, or 'def' if it is not defined
          * or not a valid {@code long}.
+         * @hide
          */
         public static long[] getLongArray(ContentResolver cr, String name, long[] def) {
             String valString = getString(cr, name);
@@ -974,6 +975,7 @@ public final class Settings {
          * @return The setting's current value.
          * @throws SettingNotFoundException Thrown if a setting by the given
          * name can't be found or the setting value is not a long array.
+         * @hide
          */
         public static long[] getLongArray(ContentResolver cr, String name)
                 throws SettingNotFoundException {
@@ -1854,6 +1856,18 @@ public final class Settings {
          * @hide
          */
         public static final String USE_CUSTOM_SEARCH_APP_ACTIVITY = "use_custom_search_app_activity";
+
+        /**
+         * Contains what to do upon long press menu
+         * @hide
+         */
+        public static final String USE_CUSTOM_LONG_MENU = "use_custom_long_press_menu";
+
+        /**
+         * Contains activity to start on long menu key press
+         * @hide
+         */
+        public static final String USE_CUSTOM_LONG_MENU_APP_ACTIVITY = "use_custom_long_menu_app_activity";
 
         /**
          * Specifies whether or not to use a custom app on long search key press
