@@ -1243,21 +1243,7 @@ status_t MPEG4Writer::Track::start(MetaData *params) {
     initTrackingProgressStatus(params);
 
     sp<MetaData> meta = new MetaData;
-    if (mIsRealTimeRecording && mOwner->numTracks() > 1) {
-        /*
-         * This extra delay of accepting incoming audio/video signals
-         * helps to align a/v start time at the beginning of a recording
-         * session, and it also helps eliminate the "recording" sound for
-         * camcorder applications.
-         *
-         * Ideally, this platform-specific value should be defined
-         * in media_profiles.xml file
-         */
-        startTimeUs += 700000;
-    }
-
     meta->setInt64(kKeyTime, startTimeUs);
-
     status_t err = mSource->start(meta.get());
     if (err != OK) {
         mDone = mReachedEOS = true;
@@ -1910,11 +1896,7 @@ status_t MPEG4Writer::Track::threadEntry() {
                      ((timestampUs * mTimeScale + 500000LL) / 1000000LL -
                      (lastTimestampUs * mTimeScale + 500000LL) / 1000000LL);
 
-            // Force the first sample to have its own stts entry so that
-            // we can adjust its value later to maintain the A/V sync.
-            if (mNumSamples == 3 || currDurationTicks != lastDurationTicks) {
-                LOGV("%s lastDurationUs: %lld us, currDurationTicks: %lld us",
-                        mIsAudio? "Audio": "Video", lastDurationUs, currDurationTicks);
+            if (currDurationTicks != lastDurationTicks) {
                 addOneSttsTableEntry(sampleCount, lastDurationUs);
                 sampleCount = 1;
             } else {
@@ -1927,8 +1909,6 @@ status_t MPEG4Writer::Track::threadEntry() {
             }
             previousSampleSize = sampleSize;
         }
-        LOGV("%s timestampUs/lastTimestampUs: %lld/%lld",
-                mIsAudio? "Audio": "Video", timestampUs, lastTimestampUs);
         lastDurationUs = timestampUs - lastTimestampUs;
         lastDurationTicks = currDurationTicks;
         lastTimestampUs = timestampUs;
@@ -2000,16 +1980,7 @@ status_t MPEG4Writer::Track::threadEntry() {
     } else {
         ++sampleCount;  // Count for the last sample
     }
-
-    if (mNumSamples <= 2) {
-        addOneSttsTableEntry(1, lastDurationUs);
-        if (sampleCount - 1 > 0) {
-            addOneSttsTableEntry(sampleCount - 1, lastDurationUs);
-        }
-    } else {
-        addOneSttsTableEntry(sampleCount, lastDurationUs);
-    }
-
+    addOneSttsTableEntry(sampleCount, lastDurationUs);
     mTrackDurationUs += lastDurationUs;
     mReachedEOS = true;
     LOGI("Received total/0-length (%d/%d) buffers and encoded %d frames. - %s",
@@ -2134,9 +2105,6 @@ void MPEG4Writer::Track::writeTrackHeader(
     int32_t mvhdTimeScale = mOwner->getTimeScale();
     int64_t trakDurationUs = getDurationUs();
 
-    // Compensate for small start time difference from different media tracks
-    int64_t trackStartTimeOffsetUs = 0;
-
     mOwner->beginBox("trak");
 
       mOwner->beginBox("tkhd");
@@ -2175,8 +2143,26 @@ void MPEG4Writer::Track::writeTrackHeader(
 
       int64_t moovStartTimeUs = mOwner->getStartTimestampUs();
       if (mStartTimestampUs != moovStartTimeUs) {
-          CHECK(mStartTimestampUs > moovStartTimeUs);
-          trackStartTimeOffsetUs = mStartTimestampUs - moovStartTimeUs;
+        mOwner->beginBox("edts");
+          mOwner->beginBox("elst");
+            mOwner->writeInt32(0);           // version=0, flags=0: 32-bit time
+            mOwner->writeInt32(2);           // never ends with an empty list
+
+            // First elst entry: specify the starting time offset
+            int64_t offsetUs = mStartTimestampUs - moovStartTimeUs;
+            LOGV("OffsetUs: %lld", offsetUs);
+            int32_t seg = (offsetUs * mvhdTimeScale + 5E5) / 1E6;
+            mOwner->writeInt32(seg);         // in mvhd timecale
+            mOwner->writeInt32(-1);          // starting time offset
+            mOwner->writeInt32(1 << 16);     // rate = 1.0
+
+            // Second elst entry: specify the track duration
+            seg = (trakDurationUs * mvhdTimeScale + 5E5) / 1E6;
+            mOwner->writeInt32(seg);         // in mvhd timescale
+            mOwner->writeInt32(0);
+            mOwner->writeInt32(1 << 16);
+          mOwner->endBox();
+        mOwner->endBox();
       }
 
       mOwner->beginBox("mdia");
@@ -2429,7 +2415,7 @@ void MPEG4Writer::Track::writeTrackHeader(
           mOwner->beginBox("stts");
             mOwner->writeInt32(0);  // version=0, flags=0
             mOwner->writeInt32(mNumSttsTableEntries);
-            int64_t prevTimestampUs = trackStartTimeOffsetUs;
+            int64_t prevTimestampUs = 0;
             for (List<SttsTableEntry>::iterator it = mSttsTableEntries.begin();
                  it != mSttsTableEntries.end(); ++it) {
                 mOwner->writeInt32(it->sampleCount);
