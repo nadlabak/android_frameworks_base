@@ -4736,7 +4736,6 @@ public final class ActivityManagerService extends ActivityManagerNative
             if (localLOGV) Slog.v(
                 TAG, "getTasks: max=" + maxNum + ", flags=" + flags
                 + ", receiver=" + receiver);
-	    /** This could be bad? Possibly, Might look into better way to do it: Pedlar
             if (checkCallingPermission(android.Manifest.permission.GET_TASKS)
                     != PackageManager.PERMISSION_GRANTED) {
                 if (receiver != null) {
@@ -4753,7 +4752,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                         + " requires " + android.Manifest.permission.GET_TASKS;
                 Slog.w(TAG, msg);
                 throw new SecurityException(msg);
-            } **/
+            }
 
             int pos = mMainStack.mHistory.size()-1;
             ActivityRecord next =
@@ -4865,8 +4864,8 @@ public final class ActivityManagerService extends ActivityManagerNative
     public List<ActivityManager.RecentTaskInfo> getRecentTasks(int maxNum,
             int flags) {
         synchronized (this) {
-            //enforceCallingPermission(android.Manifest.permission.GET_TASKS,
-            //        "getRecentTasks()");
+            enforceCallingPermission(android.Manifest.permission.GET_TASKS,
+                    "getRecentTasks()");
 
             IPackageManager pm = AppGlobals.getPackageManager();
             
