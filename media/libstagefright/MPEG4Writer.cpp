@@ -1253,7 +1253,7 @@ status_t MPEG4Writer::Track::start(MetaData *params) {
          * Ideally, this platform-specific value should be defined
          * in media_profiles.xml file
          */
-        startTimeUs += 700000;
+        startTimeUs += 1500000;
     }
 
     meta->setInt64(kKeyTime, startTimeUs);
@@ -1864,6 +1864,16 @@ status_t MPEG4Writer::Track::threadEntry() {
         }
 
         timestampUs -= previousPausedDurationUs;
+
+        // TODO: Needs investigation. TI aac enc in use, sample with timestampUs 0 suddenly coming.
+        // This shouldn't happen. Sufficient start time delay (at line 1256) seems to take care of it, though.
+        if (timestampUs < 0) {
+            LOGE("Timestamp was 0!? A/V sync will be lost. Start time delay should be increased!");
+            LOGW("%s lastTimestampUs: %lld, previousPausedDurationUs: %lld, numsamples: %d", mIsAudio? "Audio": "Video", lastTimestampUs, previousPausedDurationUs, mNumSamples);
+            copy->release();
+            copy = NULL;
+            continue;
+        }
         CHECK(timestampUs >= 0);
 
         // Media time adjustment for real-time applications
