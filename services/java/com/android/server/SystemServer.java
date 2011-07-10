@@ -368,13 +368,6 @@ class ServerThread extends Thread {
             }
 
             try {
-                Slog.i(TAG, "Location Proxy Service");
-                // Location Proxy stub, inserted as smali code
-            } catch (Throwable e) {
-                Slog.e(TAG, "Failure starting Location Proxy Service", e);
-            }
-
-            try {
                 Slog.i(TAG, "Search Service");
                 ServiceManager.addService(Context.SEARCH_SERVICE,
                         new SearchManagerService(context));
