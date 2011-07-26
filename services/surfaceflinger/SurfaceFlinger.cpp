@@ -490,7 +490,7 @@ void SurfaceFlinger::handleConsoleEvents()
     mDirtyRegion.set(hw.bounds());
 }
 
-void SurfaceFlinger::handleTransaction()
+void SurfaceFlinger::handleTransaction(uint32_t transactionFlags)
 {
     Mutex::Autolock _l(mStateLock);
     const nsecs_t now = systemTime();
