@@ -1,4 +1,3 @@
-
 package com.android.systemui.statusbar;
 
 import android.content.BroadcastReceiver;
@@ -7,15 +6,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
+import android.graphics.drawable.Animatable;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
 
-public class CmBatteryBar extends ProgressBar {
+public class CmBatteryBar extends ProgressBar implements Animatable, Runnable {
 
-    private static final String TAG = "CmBatteryBar";
+    private static final String TAG = CmBatteryBar.class.getSimpleName();
+
+    // Total animation duration
+    private static final int ANIM_DURATION = 5000; // 5 seconds
+
+    // Duration between frames of charging animation
+    private static final int FRAME_DURATION = ANIM_DURATION / 100;
 
     // Are we listening for actions?
     private boolean mAttached = false;
@@ -28,9 +34,6 @@ public class CmBatteryBar extends ProgressBar {
 
     // Current "step" of charging animation
     private int mChargingLevel = -1;
-
-    // Duration between frames of charging animation
-    private int mAnimDuration = 500;
 
     // Are we charging?
     private boolean mBatteryCharging = false;
@@ -54,31 +57,6 @@ public class CmBatteryBar extends ProgressBar {
             updateSettings();
         }
     }
-
-    private final Runnable onFakeTimer = new Runnable() {
-        @Override
-        public void run() {
-            if (mChargingLevel > -1) {
-                if (mChargingLevel < 20) {
-                    mChargingLevel += mChargingLevel % 5;
-                } else if (mChargingLevel < 90) {
-                    mChargingLevel += mChargingLevel % 10;
-                }
-                setProgress(mChargingLevel);
-                if (mChargingLevel >= 100) {
-                    mChargingLevel = mBatteryLevel;
-                } else {
-                    if (mChargingLevel < 20) {
-                        mChargingLevel += 5;
-                    } else {
-                        mChargingLevel += 10;
-                    }
-                }
-                invalidate();
-                mHandler.postDelayed(onFakeTimer, mAnimDuration);
-            }
-        }
-    };
 
     public CmBatteryBar(Context context) {
         this(context, null);
@@ -128,43 +106,19 @@ public class CmBatteryBar extends ProgressBar {
                 mBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
                 mBatteryCharging = intent.getIntExtra(BatteryManager.EXTRA_STATUS, 0) == BatteryManager.BATTERY_STATUS_CHARGING;
                 if (mBatteryCharging && mBatteryLevel < 100) {
-                    startTimer();
-                    if (mBatteryLevel % 10 == 0) {
-                        updateAnimDuration();
-                    }
+                    start();
                 } else {
-                    stopTimer();
+                    stop();
                 }
             } else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                stopTimer();
+                stop();
             } else if (Intent.ACTION_SCREEN_ON.equals(action)) {
                 if (mBatteryCharging && mBatteryLevel < 100) {
-                    startTimer();
+                    start();
                 }
             }
         }
     };
-
-    private void updateAnimDuration() {
-        mAnimDuration = 200 + (mBatteryLevel / 10) * 50;
-    }
-
-    private void startTimer() {
-        if (mChargingLevel == -1) {
-            mHandler.removeCallbacks(onFakeTimer);
-            updateAnimDuration();
-            mChargingLevel = mBatteryLevel;
-            invalidate();
-            mHandler.postDelayed(onFakeTimer, mAnimDuration);
-        }
-    }
-
-    private void stopTimer() {
-        mHandler.removeCallbacks(onFakeTimer);
-        setProgress(mBatteryLevel);
-        mChargingLevel = -1;
-        invalidate();
-    }
 
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
@@ -177,10 +131,43 @@ public class CmBatteryBar extends ProgressBar {
         }
 
         if (mBatteryCharging && mBatteryLevel < 100) {
-            startTimer();
+            start();
         } else {
-            stopTimer();
+            stop();
         }
+    }
+
+    @Override
+    public void run() {
+        mChargingLevel++;
+        if (mChargingLevel > 100) {
+            mChargingLevel = mBatteryLevel;
+        }
+        setProgress(mChargingLevel);
+        mHandler.postDelayed(this, FRAME_DURATION);
+    }
+
+    @Override
+    public void start() {
+        if (!isRunning()) {
+            mHandler.removeCallbacks(this);
+            mChargingLevel = mBatteryLevel;
+            mHandler.postDelayed(this, FRAME_DURATION);
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (isRunning()) {
+            mHandler.removeCallbacks(this);
+            mChargingLevel = -1;
+        }
+        setProgress(mBatteryLevel);
+    }
+
+    @Override
+    public boolean isRunning() {
+        return mChargingLevel != -1;
     }
 
 }
