@@ -1900,6 +1900,18 @@ public final class Settings {
         public static final String USER_DEFINED_KEY3_APP = "user_defined_key3_app";
 
         /**
+         * Stores the uri of the define application for the envelope key
+         * @hide
+         */
+        public static final String USER_DEFINED_KEY_ENVELOPE = "user_defined_key_envelope";
+
+        /**
+         * Stores the uri of the define application for the explorer key
+         * @hide
+         */
+        public static final String USER_DEFINED_KEY_EXPLORER = "user_defined_key_explorer";
+
+        /**
          * Specifies whether to prompt on the power dialog
          * @hide
          */
@@ -2554,7 +2566,7 @@ public final class Settings {
 
         /**
          * Trackball Notification Colors. The value is a String, containing a list of packages:
-         * pkg=color=blink=category|pkg=color=blink=category|...
+         * pkg=color=blink=mode=category|pkg=color=blink=mode=category|...
          * @hide
          */
         public static final String NOTIFICATION_PACKAGE_COLORS = "notification_custom_led_colors";

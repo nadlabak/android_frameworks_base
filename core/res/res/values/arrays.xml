@@ -124,6 +124,8 @@
         <item>bootloader</item>
     </string-array>
 
+    <!-- Defines the set of colors used for selecting a random
+          notification color. -->
     <string-array name="notification_led_random_color_set" translatable="false">
         <item>green</item>
         <item>white</item>
