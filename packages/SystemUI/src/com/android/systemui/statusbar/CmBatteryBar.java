@@ -7,14 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ProgressBar;
 
@@ -27,9 +22,6 @@ public class CmBatteryBar extends ProgressBar {
 
     // Should we show this?
     private boolean mShowCmBatteryBar = false;
-
-    // What color is the bar?
-    private Integer mColor = null;
 
     // Current battery level
     private int mBatteryLevel = 0;
@@ -54,10 +46,7 @@ public class CmBatteryBar extends ProgressBar {
         void observer() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUS_BAR_CM_BATTERY), false, this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUS_BAR_CM_BATTERY_COLOR), false,
-                    this);
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_BATTERY), false, this);
         }
 
         @Override
@@ -102,16 +91,6 @@ public class CmBatteryBar extends ProgressBar {
     public CmBatteryBar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        Drawable d = getProgressDrawable();
-        if (d instanceof LayerDrawable) {
-            Drawable background = ((LayerDrawable) d)
-                    .findDrawableByLayerId(com.android.internal.R.id.background);
-            if (background != null) {
-                background.mutate();
-                background.setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.SRC);
-            }
-        }
-
         SettingsObserver observer = new SettingsObserver(mHandler);
         observer.observer();
         updateSettings();
@@ -146,13 +125,10 @@ public class CmBatteryBar extends ProgressBar {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (Intent.ACTION_BATTERY_CHANGED.equals(action)) {
-                mBatteryLevel = intent.getIntExtra("level", 0);
-                mBatteryCharging = intent.getIntExtra("status", 0) == BatteryManager.BATTERY_STATUS_CHARGING;
+                mBatteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                mBatteryCharging = intent.getIntExtra(BatteryManager.EXTRA_STATUS, 0) == BatteryManager.BATTERY_STATUS_CHARGING;
                 if (mBatteryCharging && mBatteryLevel < 100) {
-                    boolean oldBatteryCharging = mBatteryCharging;
-                    if (!oldBatteryCharging) {
-                        startTimer();
-                    }
+                    startTimer();
                     if (mBatteryLevel % 10 == 0) {
                         updateAnimDuration();
                     }
@@ -169,38 +145,18 @@ public class CmBatteryBar extends ProgressBar {
         }
     };
 
-    @Override
-    public synchronized void setProgress(int progress) {
-        super.setProgress(progress);
-        Drawable d = getProgressDrawable();
-        if (d instanceof LayerDrawable) {
-            Drawable progressBar = ((LayerDrawable) d)
-                    .findDrawableByLayerId(com.android.internal.R.id.progress);
-            if (progressBar != null) {
-                progressBar.mutate();
-                if (progress <= 15) {
-                    progressBar.setColorFilter(Color.RED, PorterDuff.Mode.SRC);
-                } else if (progress <= 30) {
-                    progressBar.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC);
-                } else if (mColor != null) {
-                    progressBar.setColorFilter(mColor, PorterDuff.Mode.SRC);
-                } else {
-                    progressBar.clearColorFilter();
-                }
-            }
-        }
-    }
-
     private void updateAnimDuration() {
         mAnimDuration = 200 + (mBatteryLevel / 10) * 50;
     }
 
     private void startTimer() {
-        mHandler.removeCallbacks(onFakeTimer);
-        updateAnimDuration();
-        mChargingLevel = mBatteryLevel;
-        invalidate();
-        mHandler.postDelayed(onFakeTimer, mAnimDuration);
+        if (mChargingLevel == -1) {
+            mHandler.removeCallbacks(onFakeTimer);
+            updateAnimDuration();
+            mChargingLevel = mBatteryLevel;
+            invalidate();
+            mHandler.postDelayed(onFakeTimer, mAnimDuration);
+        }
     }
 
     private void stopTimer() {
@@ -213,23 +169,11 @@ public class CmBatteryBar extends ProgressBar {
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
         mShowCmBatteryBar = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_CM_BATTERY, 0) == 2);
+                Settings.System.STATUS_BAR_BATTERY, 0) == 2);
         if (mShowCmBatteryBar) {
             setVisibility(VISIBLE);
         } else {
             setVisibility(GONE);
-        }
-
-        String color = Settings.System.getString(resolver,
-                Settings.System.STATUS_BAR_CM_BATTERY_COLOR);
-        if (!TextUtils.isEmpty(color)) {
-            try {
-                mColor = Color.parseColor(color);
-            } catch (IllegalArgumentException e) {
-                mColor = null;
-            }
-        } else {
-            mColor = null;
         }
 
         if (mBatteryCharging && mBatteryLevel < 100) {
