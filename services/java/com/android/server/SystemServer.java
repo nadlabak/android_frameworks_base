@@ -510,7 +510,8 @@ class ServerThread extends Thread {
                         /* Intentionally skipping all null checks in this block, as we also want an
                            error message if class loading or ctor resolution failed. The catch block
                            conveniently provides that for us also for NullPointerException */
-                        DexClassLoader loader = new DexClassLoader(jarPath, cachePath, null, parentLoader);
+                        DexClassLoader loader = new DexClassLoader(jarPath, cachePath
+                                + "/dalvik-cache", null, parentLoader);
                         Class<?> klass = loader.loadClass(className);
                         Constructor<?> ctor = klass.getDeclaredConstructors()[0];
                         Object instance = ctor.newInstance(context);
