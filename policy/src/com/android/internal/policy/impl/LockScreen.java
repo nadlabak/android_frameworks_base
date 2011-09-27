@@ -943,10 +943,11 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         mNowPlaying.setVisibility(View.GONE);
         mAlbumArt.setVisibility(View.GONE);
 
-        if (am.isMusicActive() && !nowPlaying.equals("") && mLockMusicControls
-                && mCreationOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mNowPlayingToggle)
+        if (am.isMusicActive() && !nowPlaying.equals("") && mLockMusicControls) {
+            if (mNowPlayingToggle) {
                 mNowPlaying.setVisibility(View.VISIBLE);
+                mNowPlaying.setSelected(true); // set focus to TextView to allow scrolling
+            }
             // Set album art
             Uri uri = getArtworkUri(getContext(), KeyguardViewMediator.SongId(),
                     KeyguardViewMediator.AlbumId());
