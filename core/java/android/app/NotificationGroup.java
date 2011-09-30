@@ -99,8 +99,7 @@ public class NotificationGroup implements Parcelable {
     }
 
     public boolean hasPackage(String pkg) {
-        boolean result = mPackages.contains(pkg);
-        return result;
+        return mPackages.contains(pkg);
     }
 
     public boolean isDirty() {
