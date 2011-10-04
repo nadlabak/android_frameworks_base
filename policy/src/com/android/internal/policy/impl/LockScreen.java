@@ -638,7 +638,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
     }
 
     private void centerWidgets() {
-        if (mWidgetLayout == 2) {
+        if (mWidgetLayout == 2 && mCreationOrientation != Configuration.ORIENTATION_LANDSCAPE) {
             RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
             mCarrier.getLayoutParams();
             layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
