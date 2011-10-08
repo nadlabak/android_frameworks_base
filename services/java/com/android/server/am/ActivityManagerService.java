@@ -11604,8 +11604,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             adj = FOREGROUND_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
             app.adjType = "top-activity";
-            mSuppressHomeLock = "com.android.camera".equals(app.processName) ||
-                    "com.google.android.apps.maps".equals(app.processName);
+            mSuppressHomeLock = "com.android.camera".equals(app.processName);
         } else if (app.instrumentationClass != null) {
             // Don't want to kill running instrumentation.
             adj = FOREGROUND_APP_ADJ;
