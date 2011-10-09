@@ -62,6 +62,7 @@ import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.preference.MultiSelectListPreference;
 import android.provider.Settings;
+import android.provider.CmSystem.LockscreenStyle;
 import android.provider.CmSystem.RotaryStyle;
 import android.provider.CmSystem.RinglockStyle;
 import android.content.pm.ActivityInfo;
@@ -223,12 +224,15 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
     private boolean mRotaryHideArrows = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.LOCKSCREEN_ROTARY_HIDE_ARROWS, 0) == 1);
 
-    private boolean mUseRotaryLockscreen = (mLockscreenStyle == 2);
+    private boolean mUseRotaryLockscreen =
+        LockscreenStyle.getStyleById(mLockscreenStyle) == LockscreenStyle.Rotary;
 
-    private boolean mUseLenseSquareLockscreen = (mLockscreenStyle == 4);
+    private boolean mUseLenseSquareLockscreen =
+        LockscreenStyle.getStyleById(mLockscreenStyle) == LockscreenStyle.Lense;
     private boolean mLensePortrait = false;
 
-    private boolean mUseRingLockscreen = (mLockscreenStyle == 5);
+    private boolean mUseRingLockscreen =
+        LockscreenStyle.getStyleById(mLockscreenStyle) == LockscreenStyle.Ring;
 
     private boolean mRingUnlockMiddle = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.LOCKSCREEN_RING_UNLOCK_MIDDLE, 0) == 1);
@@ -554,10 +558,13 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
                 Settings.System.ROTARY_STYLE_PREF, RotaryStyle.getIdByStyle(RotaryStyle.Normal));
         boolean revampedStyle = rotaryStyle == RotaryStyle.getIdByStyle(RotaryStyle.Revamped);
 
+        mRotarySelector.setRotary(!mUseLenseSquareLockscreen && !revampedStyle);
         mRotarySelector.setRevamped(revampedStyle);
-        mRotarySelector.setLenseSquare(revampedStyle);
-        if(mRotaryHideArrows)
+        mRotarySelector.setLenseSquare(mUseLenseSquareLockscreen);
+
+        if (mRotaryHideArrows) {
             mRotarySelector.hideArrows(true);
+        }
 
         //hide most items when we are in potrait lense mode
         mLensePortrait=(mUseLenseSquareLockscreen && mCreationOrientation != Configuration.ORIENTATION_LANDSCAPE);

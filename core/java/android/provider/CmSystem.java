@@ -68,14 +68,14 @@ public final class CmSystem {
     public static final int KEYCODE_NONE = -1;
 
 
-    public enum LockscreenStyle{
+    public enum LockscreenStyle {
         Slider,
         Rotary,
         Lense,
         Ring;
 
-        static public LockscreenStyle getStyleById(int id){
-            switch (id){
+        static public LockscreenStyle getStyleById(int id) {
+            switch (id) {
                 case 1:
                     return Slider;
                 case 2:
@@ -92,11 +92,11 @@ public final class CmSystem {
             }
         }
 
-        static public LockscreenStyle getStyleById(String id){
+        static public LockscreenStyle getStyleById(String id) {
             return getStyleById(Integer.valueOf(id));
         }
 
-        static public int getIdByStyle(LockscreenStyle lockscreenstyle){
+        static public int getIdByStyle(LockscreenStyle lockscreenstyle) {
             switch (lockscreenstyle){
                 case Slider:
                     return 1;
@@ -117,8 +117,8 @@ public final class CmSystem {
         Rotary,
         Ring;
 
-        static public InCallStyle getStyleById(int id){
-            switch (id){
+        static public InCallStyle getStyleById(int id) {
+            switch (id) {
                 case 1:
                     return Slider;
                 case 2:
@@ -133,12 +133,12 @@ public final class CmSystem {
             }
         }
 
-        static public InCallStyle getStyleById(String id){
+        static public InCallStyle getStyleById(String id) {
             return getStyleById(Integer.valueOf(id));
         }
 
-        static public int getIdByStyle(InCallStyle inCallStyle){
-            switch (inCallStyle){
+        static public int getIdByStyle(InCallStyle inCallStyle) {
+            switch (inCallStyle) {
                 case Slider:
                     return 1;
                 case Rotary:
@@ -155,8 +155,8 @@ public final class CmSystem {
         Normal,
         Revamped;
 
-        static public RotaryStyle getStyleById(int id){
-            switch (id){
+        static public RotaryStyle getStyleById(int id) {
+            switch (id) {
                 case 1:
                     return Normal;
                 case 2:
@@ -182,12 +182,12 @@ public final class CmSystem {
         }
     }
 
-    public enum RinglockStyle{
+    public enum RinglockStyle {
         Bubble,
         Revamped;
 
-        static public RinglockStyle getStyleById(int id){
-            switch (id){
+        static public RinglockStyle getStyleById(int id) {
+            switch (id) {
                 case 1:
                     return Bubble;
                 case 2:
@@ -197,12 +197,12 @@ public final class CmSystem {
             }
         }
 
-        static public RinglockStyle getStyleById(String id){
+        static public RinglockStyle getStyleById(String id) {
             return getStyleById(Integer.valueOf(id));
         }
 
-        static public int getIdByStyle(RinglockStyle lockscreenstyle){
-            switch (lockscreenstyle){
+        static public int getIdByStyle(RinglockStyle style) {
+            switch (style) {
                 case Bubble:
                     return 1;
                 case Revamped:
