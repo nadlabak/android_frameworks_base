@@ -335,15 +335,9 @@ public class VolumePanel extends Handler
         mLargeStreamIcon.setVisibility(View.GONE);
         mSmallStreamIcon.setVisibility(View.VISIBLE);
 
-        if (mAudioManager.isWiredHeadsetOn()) {
-            mSmallStreamIcon.setImageResource(index == 0
-                    ? com.android.internal.R.drawable.ic_volume_headset_off_small
-                            : com.android.internal.R.drawable.ic_volume_headset_small);
-        } else {
-            mSmallStreamIcon.setImageResource(index == 0
-                    ? com.android.internal.R.drawable.ic_volume_off_small
-                            : com.android.internal.R.drawable.ic_volume_small);
-        }
+        mSmallStreamIcon.setImageResource(index == 0
+                ? com.android.internal.R.drawable.ic_volume_off_small
+                : com.android.internal.R.drawable.ic_volume_small);
     }
 
     /**
@@ -371,11 +365,11 @@ public class VolumePanel extends Handler
         if (LOGD) Log.d(TAG, "setRingerIcon(), ringerMode: " + ringerMode);
 
         if (ringerMode == AudioManager.RINGER_MODE_SILENT) {
-            icon =  mAudioManager.isWiredHeadsetOn()?com.android.internal.R.drawable.ic_volume_headset_off:com.android.internal.R.drawable.ic_volume_off;
+            icon = com.android.internal.R.drawable.ic_volume_off;
         } else if (ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
             icon = com.android.internal.R.drawable.ic_vibrate;
         } else {
-            icon = mAudioManager.isWiredHeadsetOn()?com.android.internal.R.drawable.ic_volume_headset:com.android.internal.R.drawable.ic_volume;
+            icon = com.android.internal.R.drawable.ic_volume;
         }
         mLargeStreamIcon.setImageResource(icon);
     }
