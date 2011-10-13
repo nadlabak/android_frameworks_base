@@ -3,10 +3,6 @@ ifneq ($(TARGET_SIMULATOR),true)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-ifeq ($(WITH_DEXPREOPT), true)
-  LOCAL_CFLAGS += -DDEXPREOPT_IN_USE
-endif
-
 LOCAL_SRC_FILES:= \
     installd.c commands.c utils.c
 
