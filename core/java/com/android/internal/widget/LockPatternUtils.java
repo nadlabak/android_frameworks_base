@@ -750,7 +750,7 @@ public class LockPatternUtils {
                     later,
                     where.toString(),
                     null);
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 String  title       = cursor.getString(0);
                 Date    start       = new Date(cursor.getLong(1));
                 String  description = cursor.getString(2);
