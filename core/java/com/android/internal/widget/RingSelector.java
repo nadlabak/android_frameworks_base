@@ -87,7 +87,7 @@ public class RingSelector extends ViewGroup {
      * Either {@link #HORIZONTAL} or {@link #VERTICAL}.
      */
     private int mOrientation;
-
+    private int mSelectedRingId;
     private Ring mLeftRing;
     private Ring mRightRing;
     private Ring mMiddleRing;
@@ -890,7 +890,7 @@ public class RingSelector extends ViewGroup {
                     }
                     break;
                 case MotionEvent.ACTION_UP:
-                    int secIdx = -1;
+                    mSelectedRingId = -1;
                     boolean thresholdReached = false;
 
                     if (mCurrentRing != mMiddleRing) {
@@ -902,7 +902,7 @@ public class RingSelector extends ViewGroup {
                         for (int q = 0; q < 4; q++) {
                             if (!mSecRings[q].isHidden() && mSecRings[q].contains((int) x, (int) y)) {
                                 thresholdReached = true;
-                                secIdx = q;
+                                mSelectedRingId = q;
                                 break;
                             }
                         }
@@ -912,14 +912,7 @@ public class RingSelector extends ViewGroup {
                         mTriggered = true;
                         mTracking = false;
                         mCurrentRing.setState(Ring.STATE_ACTIVE);
-
-                        boolean isLeft = mCurrentRing == mLeftRing;
-                        boolean isRight = mCurrentRing == mRightRing;
-                        dispatchTriggerEvent(isLeft ?
-                            OnRingTriggerListener.LEFT_RING : (isRight ? OnRingTriggerListener.RIGHT_RING :
-                                OnRingTriggerListener.MIDDLE_RING), secIdx);
                         startAnimating();
-
                         setGrabbedState(OnRingTriggerListener.NO_RING);
                         setKeepScreenOn(false);
                         break;
@@ -976,7 +969,12 @@ public class RingSelector extends ViewGroup {
     }
 
     private void onAnimationDone() {
-        if (mCurrentRing == mRightRing) {
+        boolean isLeft = mCurrentRing == mLeftRing;
+        boolean isRight = mCurrentRing == mRightRing;
+        dispatchTriggerEvent(isLeft ?
+                OnRingTriggerListener.LEFT_RING : (isRight ? OnRingTriggerListener.RIGHT_RING :
+                    OnRingTriggerListener.MIDDLE_RING), mSelectedRingId);
+        if (isRight) {
             resetView();
         }
         mAnimating = false;
