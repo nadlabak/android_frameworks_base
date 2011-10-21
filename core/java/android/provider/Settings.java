@@ -1918,6 +1918,13 @@ public final class Settings {
         public static final String POWER_DIALOG_PROMPT = "power_dialog_prompt";
 
         /**
+         * Specifies whether to show share dialog after
+         * taking screenshot
+         * @hide
+         */
+        public static final String SHARE_SCREENSHOT = "share_screenshot";
+
+        /**
          * How many ms to delay before enabling the security screen lock when
          * the screen goes off due to timeout
          * @hide
@@ -2478,6 +2485,12 @@ public final class Settings {
          * @hide
          */
         public static final String TRACKBALL_UNLOCK_SCREEN = "trackball_unlock_screen";
+
+        /**
+         * Whether to unlock the screen with the slide-out keyboard. The value is boolean (1 or 0).
+         * @hide
+         */
+        public static final String SLIDER_UNLOCK_SCREEN = "slider_unlock_screen";
 
         /**
          * Whether to wake the screen with the volume keys. The value is boolean (1 or 0).

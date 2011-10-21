@@ -976,7 +976,9 @@ public class RingSelector extends ViewGroup {
     }
 
     private void onAnimationDone() {
-        resetView();
+        if (isRight) {
+            resetView();
+        }
         mAnimating = false;
     }
 
