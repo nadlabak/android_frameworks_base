@@ -1217,8 +1217,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         if (newConfig.hardKeyboardHidden != mKeyboardHidden) {
             mKeyboardHidden = newConfig.hardKeyboardHidden;
             final boolean isKeyboardOpen = mKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO;
-            if (mSliderUnlockScreen && mUpdateMonitor.isKeyguardBypassEnabled() 
-                    && isKeyboardOpen && !mGestureActive) {
+            if (mSliderUnlockScreen && isKeyboardOpen) {
                 mCallback.goToUnlockScreen();
                 return;
             }
