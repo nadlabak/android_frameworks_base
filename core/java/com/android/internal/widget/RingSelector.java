@@ -365,36 +365,15 @@ public class RingSelector extends ViewGroup {
             ring.startAnimation(scaleAnim);
 
             ring.setVisibility(View.VISIBLE);
-            if (alignment == ALIGN_CENTER || alignment == ALIGN_MIDDLE) {
-                if (ring.getVisibility() == View.INVISIBLE && animate) {
-                    AlphaAnimation alphaAnim = new AlphaAnimation(0.0f, 1.0f);
-                    alphaAnim.setDuration(ANIM_CENTER_FADE_TIME);
-                    ring.startAnimation(alphaAnim);
-                }
-                else {
-                    if (animate) {
-                        TranslateAnimation trans = new TranslateAnimation(-dx, 0, -dy, 0);
-                        trans.setDuration(ANIM_DURATION);
-                        trans.setInterpolator(new OvershootInterpolator());
-                        trans.setFillAfter(false);
-                        ring.startAnimation(trans);
-                    } else {
-                        ring.clearAnimation();
-                        target.clearAnimation();
-                    }
-                }
-            }
-            else {
-                if (animate) {
-                    TranslateAnimation trans = new TranslateAnimation(-dx, 0, -dy, 0);
-                    trans.setDuration(ANIM_DURATION);
-                    trans.setInterpolator(new OvershootInterpolator());
-                    trans.setFillAfter(false);
-                    ring.startAnimation(trans);
-                } else {
-                    ring.clearAnimation();
-                    target.clearAnimation();
-                }
+            if (animate) {
+                TranslateAnimation trans = new TranslateAnimation(-dx, 0, -dy, 0);
+                trans.setDuration(ANIM_DURATION);
+                trans.setInterpolator(new OvershootInterpolator());
+                trans.setFillAfter(false);
+                ring.startAnimation(trans);
+            } else {
+                ring.clearAnimation();
+                target.clearAnimation();
             }
         }
 
@@ -659,14 +638,6 @@ public class RingSelector extends ViewGroup {
                     alignCenterX + hRingWidth, alignCenterY + hRingHeight);
         }
 
-        /**
-         * Ensure all the dependent widgets are measured.
-         */
-        public void measure() {
-            ring.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        }
-
         public boolean contains(int x, int y) {
             final Drawable ringBackground = ring.getBackground();
             final int ringWidth = ringBackground.getIntrinsicWidth();
@@ -749,7 +720,6 @@ public class RingSelector extends ViewGroup {
                 R.drawable.jog_tab_target_gray);
 
         mVibrator = (android.os.Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-        // setBackgroundColor(0x80808080);
     }
 
     @Override
@@ -864,10 +834,13 @@ public class RingSelector extends ViewGroup {
     @Override
     public void setVisibility(int visibility) {
         // Clear animations so sliders don't continue to animate when we show the widget again.
-        if (visibility != getVisibility() && visibility == View.INVISIBLE) {
+        if (visibility != getVisibility()) {
            reset(false);
+           for (SecRing secRing : mSecRings) {
+               secRing.reset(true);
+           }
+           super.setVisibility(visibility);
         }
-        super.setVisibility(visibility);
     }
 
     @Override
@@ -975,23 +948,21 @@ public class RingSelector extends ViewGroup {
                 OnRingTriggerListener.LEFT_RING : (isRight ? OnRingTriggerListener.RIGHT_RING :
                     OnRingTriggerListener.MIDDLE_RING), mSelectedRingId);
         if (isRight) {
-            resetView();
+            reset(false);
+        } else {
+            super.setVisibility(View.INVISIBLE);
+            if (!isLeft && !isRight) {
+                if (mPrevTriggered) {
+                    mCurrentRing.setRingBackgroundResource(R.drawable.jog_ring_ring_green);
+                }
+                mSecRings[mSelectedRingId].deactivate();
+            }
         }
         mAnimating = false;
     }
 
     private boolean isHorizontal() {
         return mOrientation == HORIZONTAL;
-    }
-
-    private void resetView() {
-        mLeftRing.reset(false);
-        mRightRing.reset(false);
-        mMiddleRing.reset(false);
-
-        for (SecRing secRing : mSecRings) {
-            secRing.reset(false);
-        }
     }
 
     @Override

@@ -1272,7 +1272,9 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
     /** {@inheritDoc} */
     public void onPause() {
-        mRingSelector.reset(false);
+        if (mUseRingLockscreen) {
+            mRingSelector.setVisibility(View.VISIBLE);
+        }
     }
 
     /** {@inheritDoc} */
