@@ -42,7 +42,15 @@
             android:paddingLeft="6dip"
             android:gravity="center_vertical"
             android:orientation="horizontal"/>  
-            
+
+        <com.android.systemui.statusbar.KeypadText
+            android:textAppearance="@*android:style/TextAppearance.StatusBar.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingRight="6dip"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"/>
+
         <LinearLayout android:id="@+id/statusIcons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
