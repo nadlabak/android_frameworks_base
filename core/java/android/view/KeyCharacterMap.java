@@ -21,6 +21,7 @@ import android.util.SparseIntArray;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.util.SparseArray;
 
 import java.lang.Character;
@@ -73,6 +74,7 @@ public class KeyCharacterMap
     private static Object sLock = new Object();
     private static SparseArray<WeakReference<KeyCharacterMap>> sInstances
         = new SparseArray<WeakReference<KeyCharacterMap>>();
+    private static String lastKcmProp = "";
 
     /**
      * Loads the key character maps for the keyboard with the specified device id.
@@ -83,11 +85,21 @@ public class KeyCharacterMap
     {
         synchronized (sLock) {
             KeyCharacterMap result;
-            WeakReference<KeyCharacterMap> ref = sInstances.get(keyboard);
-            if (ref != null) {
-                result = ref.get();
-                if (result != null) {
-                    return result;
+            boolean kcmUnchanged = true;
+            if (keyboard == BUILT_IN_KEYBOARD) {
+                String kcmProp = SystemProperties.get("hw.keyboards.0.devname", "0");
+                if (!kcmProp.equals(lastKcmProp)) {
+                    lastKcmProp = kcmProp;
+                    kcmUnchanged = false;
+                }
+            }
+            if (kcmUnchanged) {
+                WeakReference<KeyCharacterMap> ref = sInstances.get(keyboard);
+                if (ref != null) {
+                    result = ref.get();
+                    if (result != null) {
+                        return result;
+                    }
                 }
             }
             result = new KeyCharacterMap(keyboard);
