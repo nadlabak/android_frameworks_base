@@ -16,6 +16,7 @@
 
 package android.text.method;
 
+import android.os.SystemProperties;
 import android.text.*;
 import android.text.method.TextKeyListener.Capitalize;
 import android.util.SparseArray;
@@ -23,12 +24,25 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.View;
 
+import java.lang.Character;
+import java.lang.System;
+import java.util.Locale;
+
 /**
  * This is the standard key listener for alphabetic input on qwerty
  * keyboards.  You should generally not need to instantiate this yourself;
  * TextKeyListener will do it for you.
  */
 public class QwertyKeyListener extends BaseKeyListener {
+
+    private static int mLastKey = -1;
+    private static int mCharToReplace = -1;
+    private static int mRepeatCount = 0;
+    private static boolean mAlreadyReplaced = false;
+    private static long mLastPressTime = 0;
+    private static long multiPressTimeout = 500;
+    private static String mLang;
+
     private static QwertyKeyListener[] sInstance =
         new QwertyKeyListener[Capitalize.values().length * 2];
 
@@ -49,7 +63,221 @@ public class QwertyKeyListener extends BaseKeyListener {
             sInstance[off] = new QwertyKeyListener(cap, autotext);
         }
 
+        mLang = Locale.getDefault().getLanguage();
+        updateMPSets();
         return sInstance[off];
+    }
+    private static SparseArray<String> MP_SETS = new SparseArray<String>();
+
+    private static void updateMPSets() {
+        MP_SETS.clear();
+
+        // for Russian charset
+
+        MP_SETS.put('\u0439', "\u0446");
+        MP_SETS.put('\u0419', "\u0426");
+        MP_SETS.put('\u0444', "\u044b");
+        MP_SETS.put('\u0424', "\u042b");
+        MP_SETS.put('\u044f', "\u0447");
+        MP_SETS.put('\u042f', "\u0427");
+        MP_SETS.put('\u0445', "\u044a");
+        MP_SETS.put('\u0425', "\u042a");
+        MP_SETS.put('\u0437', "\u003f");
+        MP_SETS.put('\u0417', "\u003f");
+        MP_SETS.put('\u044e', "\u002c");
+        MP_SETS.put('\u042e', "\u002c");
+
+        if (mLang.equals("cs")) {
+            MP_SETS.put('A', "\u00C1");
+            MP_SETS.put('C', "\u010C");
+            MP_SETS.put('D', "\u010E");
+            MP_SETS.put('E', "\u00C9\u011A");
+            MP_SETS.put('I', "\u00CD");
+            MP_SETS.put('N', "\u0147");
+            MP_SETS.put('O', "\u00D3");
+            MP_SETS.put('R', "\u0158");
+            MP_SETS.put('S', "\u0160");
+            MP_SETS.put('T', "\u0164");
+            MP_SETS.put('U', "\u016E\u00DA");
+            MP_SETS.put('Y', "\u00DD");
+            MP_SETS.put('Z', "\u017D");
+            MP_SETS.put('a', "\u00E1");
+            MP_SETS.put('c', "\u010D");
+            MP_SETS.put('d', "\u010F");
+            MP_SETS.put('e', "\u00E9\u011B");
+            MP_SETS.put('i', "\u00ED");
+            MP_SETS.put('n', "\u0148");
+            MP_SETS.put('o', "\u00F3");
+            MP_SETS.put('r', "\u0159");
+            MP_SETS.put('s', "\u0161");
+            MP_SETS.put('t', "\u0165");
+            MP_SETS.put('u', "\u016F\u00FA");
+            MP_SETS.put('y', "\u00FD");
+            MP_SETS.put('z', "\u017E");
+        } else if (mLang.equals("da")) {
+            MP_SETS.put('A', "\u00C5\u00C6");
+            MP_SETS.put('E', "\u00C9");
+            MP_SETS.put('O', "\u00D8");
+            MP_SETS.put('a', "\u00E5\u00E6");
+            MP_SETS.put('e', "\u00E9");
+            MP_SETS.put('o', "\u00F8");
+        } else if (mLang.equals("de")) {
+            MP_SETS.put('A', "\u00C4");
+            MP_SETS.put('O', "\u00D6");
+            MP_SETS.put('U', "\u00DC");
+            MP_SETS.put('a', "\u00E4");
+            MP_SETS.put('o', "\u00F6");
+            MP_SETS.put('s', "\u00DF");
+            MP_SETS.put('u', "\u00FC");
+        } else if (mLang.equals("es")) {
+            MP_SETS.put('A', "\u00C1");
+            MP_SETS.put('E', "\u00C9");
+            MP_SETS.put('I', "\u00CD");
+            MP_SETS.put('N', "\u00D1");
+            MP_SETS.put('O', "\u00D3");
+            MP_SETS.put('U', "\u00DA\u00DC");
+            MP_SETS.put('a', "\u00E1");
+            MP_SETS.put('e', "\u00E9");
+            MP_SETS.put('i', "\u00ED");
+            MP_SETS.put('n', "\u00F1");
+            MP_SETS.put('o', "\u00F3");
+            MP_SETS.put('u', "\u00FA\u00FC");
+            MP_SETS.put('?', "\u00bf");
+            MP_SETS.put('!', "\u00a1");
+        } else if (mLang.equals("fi")) {
+            MP_SETS.put('A', "\u00C4\u00C5");
+            MP_SETS.put('O', "\u00D6");
+            MP_SETS.put('a', "\u00E4\u00E5");
+            MP_SETS.put('o', "\u00F6");
+        } else if (mLang.equals("fr")) {
+            MP_SETS.put('A', "\u00C0\u00C2\u00C6");
+            MP_SETS.put('C', "\u00C7");
+            MP_SETS.put('E', "\u00C9\u00C8\u00CA\u00CB");
+            MP_SETS.put('I', "\u00CF\u00CE");
+            MP_SETS.put('O', "\u00D4\u0152");
+            MP_SETS.put('U', "\u00D9\u00DB");
+            MP_SETS.put('Y', "\u0178");
+            MP_SETS.put('a', "\u00E0\u00E2\u00E6");
+            MP_SETS.put('c', "\u00E7");
+            MP_SETS.put('e', "\u00E9\u00E8\u00EA\u00EB");
+            MP_SETS.put('i', "\u00EF\u00EE");
+            MP_SETS.put('o', "\u00F4\u0153");
+            MP_SETS.put('u', "\u00F9\u00FB");
+            MP_SETS.put('y', "\u00FF");
+        } else if (mLang.equals("hu")) {
+            MP_SETS.put('A', "\u00C1");
+            MP_SETS.put('E', "\u00C9");
+            MP_SETS.put('I', "\u00CD");
+            MP_SETS.put('O', "\u00D6\u00D3\u0150");
+            MP_SETS.put('U', "\u00DC\u00DA\u0170");
+            MP_SETS.put('a', "\u00E1");
+            MP_SETS.put('e', "\u00E9");
+            MP_SETS.put('i', "\u00ED");
+            MP_SETS.put('o', "\u00F6\u00F3\u0151");
+            MP_SETS.put('u', "\u00FC\u00FA\u0171");
+        } else if (mLang.equals("it")) {
+            MP_SETS.put('A', "\u00C0");
+            MP_SETS.put('E', "\u00C8\u00C9");
+            MP_SETS.put('I', "\u00CC");
+            MP_SETS.put('O', "\u00D2\u00D3");
+            MP_SETS.put('U', "\u00D9");
+            MP_SETS.put('a', "\u00E0");
+            MP_SETS.put('e', "\u00E8\u00E9");
+            MP_SETS.put('i', "\u00EC");
+            MP_SETS.put('o', "\u00F2\u00F3");
+            MP_SETS.put('u', "\u00F9");
+        } else if (mLang.equals("nl")) {
+            MP_SETS.put('E', "\u00C9\u00CB");
+            MP_SETS.put('I', "\u00CF");
+            MP_SETS.put('O', "\u00D3\u00D6");
+            MP_SETS.put('U', "\u00DC");
+            MP_SETS.put('e', "\u00E9\u00EB");
+            MP_SETS.put('i', "\u00EF");
+            MP_SETS.put('o', "\u00F3\u00F6");
+            MP_SETS.put('u', "\u00FC");
+        } else if (mLang.equals("no")) {
+            MP_SETS.put('A', "\u00C5\u00C6\u00C2");
+            MP_SETS.put('E', "\u00C9\u00C8\u00CA");
+            MP_SETS.put('O', "\u00D8\u00D3\u00D2\u00D4");
+            MP_SETS.put('a', "\u00E5\u00E6\u00E2");
+            MP_SETS.put('e', "\u00E9\u00E8\u00EA\u00EB");
+            MP_SETS.put('o', "\u00F8\u00F3\u00F2\u00F4");
+        } else if (mLang.equals("pl")) {
+            MP_SETS.put('A', "\u0104");
+            MP_SETS.put('C', "\u0106");
+            MP_SETS.put('E', "\u0118");
+            MP_SETS.put('L', "\u0141");
+            MP_SETS.put('N', "\u0143");
+            MP_SETS.put('O', "\u00D3");
+            MP_SETS.put('S', "\u015A");
+            MP_SETS.put('Z', "\u0179\u017B");
+            MP_SETS.put('a', "\u0105");
+            MP_SETS.put('c', "\u0107");
+            MP_SETS.put('e', "\u0119");
+            MP_SETS.put('l', "\u0142");
+            MP_SETS.put('n', "\u0144");
+            MP_SETS.put('o', "\u00F3");
+            MP_SETS.put('s', "\u015B");
+            MP_SETS.put('z', "\u017A\u017C");
+        } else if (mLang.equals("pt")) {
+            MP_SETS.put('A', "\u00C3\u00C1\u00C2\u00C0");
+            MP_SETS.put('C', "\u00C7");
+            MP_SETS.put('E', "\u00C9\u00CA");
+            MP_SETS.put('I', "\u00CD");
+            MP_SETS.put('O', "\u00D5\u00D3\u00D4");
+            MP_SETS.put('U', "\u00DA\u00DC");
+            MP_SETS.put('a', "\u00E3\u00E1\u00E2\u00E0");
+            MP_SETS.put('c', "\u00E7");
+            MP_SETS.put('e', "\u00E9\u00EA");
+            MP_SETS.put('i', "\u00ED");
+            MP_SETS.put('o', "\u00F5\u00F3\u00F4");
+            MP_SETS.put('u', "\u00FA\u00FC");
+        } else if (mLang.equals("ro")) {
+            MP_SETS.put('A', "\u0102\u00C2");
+            MP_SETS.put('I', "\u00CE");
+            MP_SETS.put('S', "\u0218");
+            MP_SETS.put('T', "\u0162");
+            MP_SETS.put('a', "\u0103\u00E2");
+            MP_SETS.put('i', "\u00EE");
+            MP_SETS.put('s', "\u0219");
+            MP_SETS.put('t', "\u0163");
+        } else if (mLang.equals("sk")) {
+            MP_SETS.put('A', "\u00C1\u00C4");
+            MP_SETS.put('C', "\u010C");
+            MP_SETS.put('D', "\u010E");
+            MP_SETS.put('E', "\u00C9");
+            MP_SETS.put('I', "\u00CD");
+            MP_SETS.put('L', "\u013D\u0139");
+            MP_SETS.put('N', "\u0147");
+            MP_SETS.put('O', "\u00D3");
+            MP_SETS.put('R', "\u0154");
+            MP_SETS.put('S', "\u0160");
+            MP_SETS.put('T', "\u0164");
+            MP_SETS.put('U', "\u00DA");
+            MP_SETS.put('Y', "\u00DD");
+            MP_SETS.put('Z', "\u017D");
+            MP_SETS.put('a', "\u00E1\u00E4");
+            MP_SETS.put('c', "\u010D");
+            MP_SETS.put('d', "\u010F");
+            MP_SETS.put('e', "\u00E9");
+            MP_SETS.put('i', "\u00ED");
+            MP_SETS.put('l', "\u013E\u013A");
+            MP_SETS.put('n', "\u0148");
+            MP_SETS.put('o', "\u00F3");
+            MP_SETS.put('r', "\u0155");
+            MP_SETS.put('s', "\u0161");
+            MP_SETS.put('t', "\u0165");
+            MP_SETS.put('u', "\u00FA");
+            MP_SETS.put('y', "\u00FD");
+            MP_SETS.put('z', "\u017E");
+        } else if (mLang.equals("sv")) {
+            MP_SETS.put('A', "\u00C4\u00C5");
+            MP_SETS.put('E', "\u00C9");
+            MP_SETS.put('O', "\u00D6");
+            MP_SETS.put('a', "\u00E4\u00E5");
+            MP_SETS.put('e', "\u00E9");
+            MP_SETS.put('o', "\u00F6");
+        }
     }
 
     public int getInputType() {
@@ -84,14 +312,57 @@ public class QwertyKeyListener extends BaseKeyListener {
         // QWERTY keyboard normal case
 
         int i = event.getUnicodeChar(getMetaState(content));
+        int k = event.getKeyCode();
+        multiPressTimeout = SystemProperties.getInt("persist.sys.keypad_multipress_t", 500);
+        String lang = Locale.getDefault().getLanguage();
+        if (!lang.equals(mLang)) {
+            mLang = lang;
+            updateMPSets();
+        }
 
         int count = event.getRepeatCount();
+
+        if (count == 0 && i != 0 && !KeyEvent.isModifierKey(k)) {
+            long currTime = System.currentTimeMillis();
+            if (k == mLastKey && multiPressTimeout >= currTime - mLastPressTime && selStart > 0) {
+                mRepeatCount++;
+                if (!mAlreadyReplaced) {
+                    mCharToReplace = content.charAt(selStart - 1);
+                }
+                String set = MP_SETS.get(mCharToReplace);
+                if (set != null) {
+                    if (mRepeatCount > set.length()) {
+                        mRepeatCount = 0;
+                        content.replace(selEnd - 1, selEnd,
+                                new String(Character.toChars(mCharToReplace)));
+                    } else {
+                        content.replace(selEnd - 1, selEnd, String.valueOf(set.charAt(mRepeatCount-1)));
+                    }
+                    mLastPressTime = currTime;
+                    mLastKey = k;
+                    mAlreadyReplaced = true;
+                    adjustMetaAfterKeypress(content);
+                    return true;
+                }
+            } else {
+                mRepeatCount = 0;
+            }
+            mLastPressTime = currTime;
+            mLastKey = k;
+            mAlreadyReplaced = false;
+            mCharToReplace = i;
+        }
+
         if (count > 0 && selStart == selEnd && selStart > 0) {
             char c = content.charAt(selStart - 1);
-
-            if (c == i || c == Character.toUpperCase(i) && view != null) {
+            String set = PICKER_SETS.get(i);
+            if (count > 1 && set != null &&
+                    (c == set.charAt(0) || c == Character.toUpperCase(set.charAt(0)))) {
+                adjustMetaAfterKeypress(content);
+                return true;
+            } else if (view != null && (c == i || c == Character.toUpperCase(i))) {
                 if (showCharacterPicker(view, content, c, false, count)) {
-                    resetMetaState(content);
+                    adjustMetaAfterKeypress(content);
                     return true;
                 }
             }
@@ -412,13 +683,13 @@ public class QwertyKeyListener extends BaseKeyListener {
         PICKER_SETS.put('D', "\u010E");
         PICKER_SETS.put('E', "\u00C8\u00C9\u00CA\u00CB\u0118\u011A\u0112");
         PICKER_SETS.put('G', "\u011E");
-        PICKER_SETS.put('L', "\u0141");
+        PICKER_SETS.put('L', "\u0141\u013d\u0139");
         PICKER_SETS.put('I', "\u00CC\u00CD\u00CE\u00CF\u012A\u0130");
         PICKER_SETS.put('N', "\u00D1\u0143\u0147");
         PICKER_SETS.put('O', "\u00D8\u0152\u00D5\u00D2\u00D3\u00D4\u00D6\u014C");
         PICKER_SETS.put('R', "\u0158");
-        PICKER_SETS.put('S', "\u015A\u0160\u015E");
-        PICKER_SETS.put('T', "\u0164");
+        PICKER_SETS.put('S', "\u015A\u0160\u015E\u0218");
+        PICKER_SETS.put('T', "\u0164\u0162");
         PICKER_SETS.put('U', "\u00D9\u00DA\u00DB\u00DC\u016E\u016A");
         PICKER_SETS.put('Y', "\u00DD\u0178");
         PICKER_SETS.put('Z', "\u0179\u017B\u017D");
@@ -428,12 +699,12 @@ public class QwertyKeyListener extends BaseKeyListener {
         PICKER_SETS.put('e', "\u00E8\u00E9\u00EA\u00EB\u0119\u011B\u0113");
         PICKER_SETS.put('g', "\u011F");
         PICKER_SETS.put('i', "\u00EC\u00ED\u00EE\u00EF\u012B\u0131");
-        PICKER_SETS.put('l', "\u0142");
+        PICKER_SETS.put('l', "\u0142\u013E\u013A");
         PICKER_SETS.put('n', "\u00F1\u0144\u0148");
         PICKER_SETS.put('o', "\u00F8\u0153\u00F5\u00F2\u00F3\u00F4\u00F6\u014D");
-        PICKER_SETS.put('r', "\u0159");
-        PICKER_SETS.put('s', "\u00A7\u00DF\u015B\u0161\u015F");
-        PICKER_SETS.put('t', "\u0165");
+        PICKER_SETS.put('r', "\u0159\u0155");
+        PICKER_SETS.put('s', "\u00A7\u00DF\u015B\u0161\u015F\u0219");
+        PICKER_SETS.put('t', "\u0165\u0163");
         PICKER_SETS.put('u', "\u00F9\u00FA\u00FB\u00FC\u016F\u016B");
         PICKER_SETS.put('y', "\u00FD\u00FF");
         PICKER_SETS.put('z', "\u017A\u017C\u017E");
@@ -467,6 +738,22 @@ public class QwertyKeyListener extends BaseKeyListener {
         PICKER_SETS.put('=', "\u2260\u2248\u221e");
         PICKER_SETS.put('<', "\u2264\u00ab\u2039");
         PICKER_SETS.put('>', "\u2265\u00bb\u203a");
+
+        // Russian
+
+        PICKER_SETS.put('\u0439', "\u0446");
+        PICKER_SETS.put('\u0419', "\u0426");
+        PICKER_SETS.put('\u0444', "\u044b");
+        PICKER_SETS.put('\u0424', "\u042b");
+        PICKER_SETS.put('\u044f', "\u0447");
+        PICKER_SETS.put('\u042f', "\u0427");
+        PICKER_SETS.put('\u0445', "\u044a");
+        PICKER_SETS.put('\u0425', "\u042a");
+        PICKER_SETS.put('\u0437', "\u003f");
+        PICKER_SETS.put('\u0417', "\u003f");
+        PICKER_SETS.put('\u044e', "\u002c");
+        PICKER_SETS.put('\u042e', "\u002c");
+
     };
 
     private boolean showCharacterPicker(View view, Editable content, char c,
@@ -477,8 +764,17 @@ public class QwertyKeyListener extends BaseKeyListener {
         }
 
         if (count == 1) {
-            new CharacterPickerDialog(view.getContext(),
+            if (set.length() == 1) {
+                int selEnd = Selection.getSelectionEnd(content);
+                if (insert || selEnd == 0) {
+                    content.insert(selEnd, set);
+                } else {
+                    content.replace(selEnd - 1, selEnd, set);
+                }
+            } else {
+                new CharacterPickerDialog(view.getContext(),
                                       view, content, set, insert).show();
+            }
         }
 
         return true;
