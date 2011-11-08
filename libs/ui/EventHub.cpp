@@ -805,7 +805,16 @@ int EventHub::openDevice(const char *deviceName) {
             // this device better not go away.
             mHaveFirstKeyboard = true;
             mFirstKeyboardId = device->id;
-            property_set("hw.keyboards.0.devname", name);
+            char keypadPrimary[PROPERTY_VALUE_MAX];
+            char keypadPriFileName[PROPERTY_VALUE_MAX];
+            property_get("persist.sys.keypad_type", keypadPrimary, "0");
+            property_get("ro.sys.keypad_prefix", keypadPriFileName, "0");
+            if (strcmp(keypadPrimary,"0") && strcmp(keypadPriFileName,"0")) {
+                strcat(keypadPriFileName, keypadPrimary);
+                property_set("hw.keyboards.0.devname", keypadPriFileName);
+            } else {
+                property_set("hw.keyboards.0.devname", name);
+            }
         } else {
             // ensure mFirstKeyboardId is set to -something-.
             if (mFirstKeyboardId == 0) {
