@@ -288,18 +288,6 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
             String user, String password, String authType, String protocol,
             Message result) {
 
-        if (SystemProperties.get("ro.build.product").equals("p970")) {
-            /* Set GPRS class */
-            RILRequest rrCs = RILRequest.obtain(
-                    273, null);
-            rrCs.mp.writeInt(2);
-            rrCs.mp.writeInt(1);
-                rrCs.mp.writeInt(1);
-            if (RILJ_LOGD) riljLog(rrCs.serialString() + "> "
-                    + requestToString(rrCs.mRequest));
-            send(rrCs);
-        }
-
         saveDataCall = result;
         RILRequest rr
                 = RILRequest.obtain(RIL_REQUEST_SETUP_DATA_CALL, result);
@@ -571,9 +559,12 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
         }
 
         if (rr.mRequest == RIL_REQUEST_SETUP_DATA_CALL) {
-            rr.release();
-            showPdpAddress(saveDataCall);
-            return;
+            String[] strings = (String[]) ret;
+            if (strings.length <=2 || strings[1].indexOf("vsnet") == 0) {
+                rr.release();
+                showPdpAddress(saveDataCall);
+                return;
+            }
         }
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "< " + requestToString(rr.mRequest)

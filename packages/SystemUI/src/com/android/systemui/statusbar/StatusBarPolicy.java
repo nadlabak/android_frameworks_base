@@ -113,6 +113,9 @@ public class StatusBarPolicy {
     // phone
     private TelephonyManager mPhone;
     private int mPhoneSignalIconId;
+    public static final int PHONE_SIGNAL_IS_AIRPLANE_MODE = 1;
+    public static final int PHONE_SIGNAL_IS_NULL = 2;
+    public static final int PHONE_SIGNAL_IS_NORMAL = 0;
 
     //***** Signal strength icons
     //GSM/UMTS
@@ -668,9 +671,7 @@ public class StatusBarPolicy {
         }
 
         // hide phone_signal icon if hidden
-        if (mPhoneSignalHidden) {
-            mService.setIconVisibility("phone_signal", false);
-        }
+        mService.setIconVisibility("phone_signal", !mPhoneSignalHidden && !mShowCmSignal);
 
         // register for phone state notifications.
         ((TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE))
@@ -1118,12 +1119,6 @@ public class StatusBarPolicy {
     }
 
     private final void updateSignalStrength() {
-        updateSignalStrengthDbm();
-        if (mShowCmSignal) {
-            mService.setIconVisibility("phone_signal", false);
-            return;
-        }
-
         int iconLevel = -1;
         int[] iconList;
 
@@ -1133,14 +1128,26 @@ public class StatusBarPolicy {
             if (Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.AIRPLANE_MODE_ON, 0) == 1) {
                 mPhoneSignalIconId = R.drawable.stat_sys_signal_flightmode;
+                updateSignalStrengthDbm(PHONE_SIGNAL_IS_AIRPLANE_MODE);
+                // show the icon depening on mPhoneSignalHidden (and regardless of
+                // the value of CmShowCmSignal)
+                mService.setIconVisibility("phone_signal", !mPhoneSignalHidden);
             } else {
                 mPhoneSignalIconId = R.drawable.stat_sys_signal_null;
+                updateSignalStrengthDbm(PHONE_SIGNAL_IS_NULL);
+                // set phone_signal visibility false if hidden
+                // and hide it if CmSignalText is used
+                mService.setIconVisibility("phone_signal", !mPhoneSignalHidden && !mShowCmSignal);
             }
             mService.setIcon("phone_signal", mPhoneSignalIconId, 0);
-            // set phone_signal visibility false if hidden
-            if (mPhoneSignalHidden) {
-                mService.setIconVisibility("phone_signal", false);
-            }
+            return;
+        }
+
+        // calculate and update the dBm value of the signal strength
+        updateSignalStrengthDbm(PHONE_SIGNAL_IS_NORMAL);
+        if (mShowCmSignal) {
+            // if we show the dBm value, hide the standard icon and quit this method.
+            mService.setIconVisibility("phone_signal", false);
             return;
         }
 
@@ -1245,7 +1252,7 @@ public class StatusBarPolicy {
         return (levelEvdoDbm < levelEvdoSnr) ? levelEvdoDbm : levelEvdoSnr;
     }
 
-    public void updateSignalStrengthDbm() {
+    public void updateSignalStrengthDbm(int phoneSignalStatus) {
         int dBm = -1;
 
         if(!mSignalStrength.isGsm()) {
@@ -1260,6 +1267,7 @@ public class StatusBarPolicy {
 
         Intent dbmIntent = new Intent(Intent.ACTION_SIGNAL_DBM_CHANGED);
         dbmIntent.putExtra("dbm", dBm);
+        dbmIntent.putExtra("signal_status", phoneSignalStatus);
         mContext.sendBroadcast(dbmIntent);
     }
 
@@ -1638,20 +1646,20 @@ public class StatusBarPolicy {
         }
     }
 
-    private void updateSettings(){
+    private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
 
         mStatusBarBattery = (Settings.System.getInt(resolver,
                 Settings.System.STATUS_BAR_BATTERY, 0) == 0);
         mService.setIconVisibility("battery", mStatusBarBattery);
 
-        //0 will hide the cmsignaltext and show the signal bars
-        mShowCmSignal = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_CM_SIGNAL_TEXT, 0) != 0;
-        mService.setIconVisibility("phone_signal", !mShowCmSignal);
-
         mShowHeadset = (Settings.System.getInt(resolver,
                 Settings.System.STATUS_BAR_HEADSET, 1) == 1);
         mService.setIconVisibility("headset", mShowHeadset && mHeadsetPlugged);
+
+        // 0 will hide the cmsignaltext and show the signal bars
+        mShowCmSignal = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_CM_SIGNAL_TEXT, 0) != 0;
+        mService.setIconVisibility("phone_signal", !mPhoneSignalHidden && !mShowCmSignal);
     }
 }

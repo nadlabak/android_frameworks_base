@@ -738,9 +738,9 @@ public class LockPatternUtils {
         String nextCalendarAlarm = null;
         Cursor cursor = null;
         try {
-            cursor = Calendar.Instances.query(mContentResolver, 
+            cursor = Calendar.Instances.query(mContentResolver,
                     new String[] {
-                        Calendar.EventsColumns.TITLE, 
+                        Calendar.EventsColumns.TITLE,
                         Calendar.EventsColumns.DTSTART,
                         Calendar.EventsColumns.DESCRIPTION,
                         Calendar.EventsColumns.EVENT_LOCATION,
