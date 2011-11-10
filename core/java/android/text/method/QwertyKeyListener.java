@@ -84,8 +84,10 @@ public class QwertyKeyListener extends BaseKeyListener {
         MP_SETS.put('\u0425', "\u042a");
         MP_SETS.put('\u0437', "\u003f");
         MP_SETS.put('\u0417', "\u003f");
-        MP_SETS.put('\u044e', "\u002c");
-        MP_SETS.put('\u042e', "\u002c");
+        MP_SETS.put('\u044e', "\u003f");
+        MP_SETS.put('\u042e', "\u003f");
+        MP_SETS.put('\u0436', "\u044d");
+        MP_SETS.put('\u0416', "\u042d");
 
         if (mLang.equals("cs")) {
             MP_SETS.put('A', "\u00C1");
@@ -241,6 +243,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('i', "\u00EE");
             MP_SETS.put('s', "\u0219");
             MP_SETS.put('t', "\u0163");
+        } else if (mLang.equals("ru")) {
+            MP_SETS.put('\u002e', "\u002c");
         } else if (mLang.equals("sk")) {
             MP_SETS.put('A', "\u00C1\u00C4");
             MP_SETS.put('C', "\u010C");
@@ -751,8 +755,10 @@ public class QwertyKeyListener extends BaseKeyListener {
         PICKER_SETS.put('\u0425', "\u042a");
         PICKER_SETS.put('\u0437', "\u003f");
         PICKER_SETS.put('\u0417', "\u003f");
-        PICKER_SETS.put('\u044e', "\u002c");
-        PICKER_SETS.put('\u042e', "\u002c");
+        PICKER_SETS.put('\u044e', "\u003f");
+        PICKER_SETS.put('\u042e', "\u003f");
+        PICKER_SETS.put('\u0436', "\u044d");
+        PICKER_SETS.put('\u0416', "\u042d");
 
     };
 
