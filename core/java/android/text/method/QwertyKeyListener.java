@@ -274,6 +274,13 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('u', "\u00FA");
             MP_SETS.put('y', "\u00FD");
             MP_SETS.put('z', "\u017E");
+        } else if (mLang.equals("sl")) {
+            MP_SETS.put('c', "\u010D");
+            MP_SETS.put('s', "\u0161");
+            MP_SETS.put('z', "\u017E");
+            MP_SETS.put('C', "\u010C");
+            MP_SETS.put('S', "\u0160");
+            MP_SETS.put('Z', "\u017D");
         } else if (mLang.equals("sv")) {
             MP_SETS.put('A', "\u00C4\u00C5");
             MP_SETS.put('E', "\u00C9");
