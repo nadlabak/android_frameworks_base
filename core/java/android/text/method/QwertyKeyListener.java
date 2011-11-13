@@ -265,14 +265,14 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('E', "\u0118\u0116");
             MP_SETS.put('I', "\u012E");
             MP_SETS.put('S', "\u0160");
-            MP_SETS.put('U', "\u0172\u016A);
+            MP_SETS.put('U', "\u0172\u016A");
             MP_SETS.put('Z', "\u017D");
             MP_SETS.put('a', "\u0105");
             MP_SETS.put('c', "\u010D");
             MP_SETS.put('e', "\u0119\u0117");
             MP_SETS.put('i', "\u012F");
             MP_SETS.put('s', "\u0161");
-            MP_SETS.put('u', "\u0173\u016B);
+            MP_SETS.put('u', "\u0173\u016B");
             MP_SETS.put('z', "\u017E");
         } else if (mLang.equals("nl")) {
             MP_SETS.put('E', "\u00C9\u00CB");
