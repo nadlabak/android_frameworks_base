@@ -65,41 +65,101 @@ public class QwertyKeyListener extends BaseKeyListener {
 
         mLang = Locale.getDefault().getLanguage();
         updateMPSets();
+        updateCyrillicMPSets();
         return sInstance[off];
     }
     private static SparseArray<String> MP_SETS = new SparseArray<String>();
 
+    private static void updateCyrillicMPSets() {
+        String currentKeycharmap = SystemProperties.get("hw.keyboards.0.devname", "0");
+        MP_SETS.delete('\u002e');
+        if (currentKeycharmap.contains("russian2")) {
+            MP_SETS.delete('\u0444');
+            MP_SETS.delete('\u0424');
+            MP_SETS.delete('\u0437');
+            MP_SETS.delete('\u0417');
+            MP_SETS.delete('\u0446');
+            MP_SETS.delete('\u0426');
+            MP_SETS.delete('\u0448');
+            MP_SETS.delete('\u0428');
+            MP_SETS.delete('\u0430');
+            MP_SETS.delete('\u0410');
+            MP_SETS.delete('\u0435');
+            MP_SETS.delete('\u0415');
+            MP_SETS.delete('\u041e');
+            MP_SETS.delete('\u043e');
+            MP_SETS.delete('\u044c');
+            MP_SETS.delete('\u042c');
+            MP_SETS.put('\u0439', "\u0446");
+            MP_SETS.put('\u0419', "\u0426");
+            MP_SETS.put('\u044f', "\u0447");
+            MP_SETS.put('\u042f', "\u0427");
+            MP_SETS.put('\u0445', "\u044a");
+            MP_SETS.put('\u0425', "\u042a");
+            MP_SETS.put('\u002e', "\u002c");
+            MP_SETS.put('\u044e', "\u003f");
+            MP_SETS.put('\u042e', "\u003f");
+            MP_SETS.put('\u0436', "\u044d");
+            MP_SETS.put('\u0416', "\u042d");
+        } else if (currentKeycharmap.contains("russian")) {
+            MP_SETS.delete('\u0436');
+            MP_SETS.delete('\u0416');
+            MP_SETS.delete('\u0446');
+            MP_SETS.delete('\u0426');
+            MP_SETS.delete('\u0448');
+            MP_SETS.delete('\u0428');
+            MP_SETS.delete('\u0430');
+            MP_SETS.delete('\u0410');
+            MP_SETS.delete('\u0435');
+            MP_SETS.delete('\u0415');
+            MP_SETS.delete('\u041e');
+            MP_SETS.delete('\u043e');
+            MP_SETS.delete('\u044c');
+            MP_SETS.delete('\u042c');
+            MP_SETS.put('\u0439', "\u0446");
+            MP_SETS.put('\u0419', "\u0426");
+            MP_SETS.put('\u0444', "\u044b");
+            MP_SETS.put('\u0424', "\u042b");
+            MP_SETS.put('\u044f', "\u0447");
+            MP_SETS.put('\u042f', "\u0427");
+            MP_SETS.put('\u0445', "\u044a");
+            MP_SETS.put('\u0425', "\u042a");
+            MP_SETS.put('\u0437', "\u003f");
+            MP_SETS.put('\u0417', "\u003f");
+            MP_SETS.put('\u044e', "\u002c");
+            MP_SETS.put('\u042e', "\u002c");
+        } else if (currentKeycharmap.contains("cyrillic")) {
+            MP_SETS.delete('\u0436');
+            MP_SETS.delete('\u0416');
+            MP_SETS.delete('\u0444');
+            MP_SETS.delete('\u0424');
+            MP_SETS.delete('\u0439');
+            MP_SETS.delete('\u0419');
+            MP_SETS.delete('\u044f');
+            MP_SETS.delete('\u042f');
+            MP_SETS.delete('\u0445');
+            MP_SETS.delete('\u0425');
+            MP_SETS.delete('\u044e');
+            MP_SETS.delete('\u042e');
+            MP_SETS.put('\u0446', "\u0447");
+            MP_SETS.put('\u0426', "\u0427");
+            MP_SETS.put('\u0448', "\u0449");
+            MP_SETS.put('\u0428', "\u0429");
+            MP_SETS.put('\u0430', "\u044f");
+            MP_SETS.put('\u0410', "\u042f");
+            MP_SETS.put('\u0435', "\u044d");
+            MP_SETS.put('\u0415', "\u042d");
+            MP_SETS.put('\u0437', "\u0436");
+            MP_SETS.put('\u0417', "\u0416");
+            MP_SETS.put('\u041e', "\u0401");
+            MP_SETS.put('\u043e', "\u0451");
+            MP_SETS.put('\u044c', "\u044a");
+            MP_SETS.put('\u042c', "\u042a");
+        }
+    }
+
     private static void updateMPSets() {
         MP_SETS.clear();
-
-        // for Cyrillic/Russian charset
-
-        MP_SETS.put('\u0439', "\u0446");
-        MP_SETS.put('\u0419', "\u0426");
-        MP_SETS.put('\u0444', "\u044b");
-        MP_SETS.put('\u0424', "\u042b");
-        MP_SETS.put('\u044f', "\u0447");
-        MP_SETS.put('\u042f', "\u0427");
-        MP_SETS.put('\u0445', "\u044a");
-        MP_SETS.put('\u0425', "\u042a");
-        MP_SETS.put('\u044e', "\u003f");
-        MP_SETS.put('\u042e', "\u003f");
-        MP_SETS.put('\u0436', "\u044d");
-        MP_SETS.put('\u0416', "\u042d");
-        MP_SETS.put('\u0446', "\u0447");
-        MP_SETS.put('\u0426', "\u0427");
-        MP_SETS.put('\u0448', "\u0449");
-        MP_SETS.put('\u0428', "\u0429");
-        MP_SETS.put('\u0430', "\u044f");
-        MP_SETS.put('\u0410', "\u042f");
-        MP_SETS.put('\u0435', "\u044d");
-        MP_SETS.put('\u0415', "\u042d");
-        MP_SETS.put('\u0437', "\u0436");
-        MP_SETS.put('\u0417', "\u0416");
-        MP_SETS.put('\u0437', "\u0436");
-        MP_SETS.put('\u041e', "\u0401");
-        MP_SETS.put('\u043e', "\u0451");
-
         if (mLang.equals("cs")) {
             MP_SETS.put('A', "\u00C1");
             MP_SETS.put('C', "\u010C");
@@ -199,6 +259,21 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('i', "\u00EC");
             MP_SETS.put('o', "\u00F2\u00F3");
             MP_SETS.put('u', "\u00F9");
+        } else if (mLang.equals("lt")) {
+            MP_SETS.put('A', "\u0104");
+            MP_SETS.put('C', "\u010C");
+            MP_SETS.put('E', "\u0118\u0116");
+            MP_SETS.put('I', "\u012E");
+            MP_SETS.put('S', "\u0160");
+            MP_SETS.put('U', "\u0172\u016A);
+            MP_SETS.put('Z', "\u017D");
+            MP_SETS.put('a', "\u0105");
+            MP_SETS.put('c', "\u010D");
+            MP_SETS.put('e', "\u0119\u0117");
+            MP_SETS.put('i', "\u012F");
+            MP_SETS.put('s', "\u0161");
+            MP_SETS.put('u', "\u0173\u016B);
+            MP_SETS.put('z', "\u017E");
         } else if (mLang.equals("nl")) {
             MP_SETS.put('E', "\u00C9\u00CB");
             MP_SETS.put('I', "\u00CF");
@@ -254,8 +329,6 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('i', "\u00EE");
             MP_SETS.put('s', "\u0219");
             MP_SETS.put('t', "\u0163");
-        } else if (mLang.equals("ru")) {
-            MP_SETS.put('\u002e', "\u002c");
         } else if (mLang.equals("sk")) {
             MP_SETS.put('A', "\u00C1\u00C4");
             MP_SETS.put('C', "\u010C");
@@ -343,6 +416,11 @@ public class QwertyKeyListener extends BaseKeyListener {
         }
 
         int count = event.getRepeatCount();
+
+        if (count == 0 && i == KeyEvent.KEYCODE_SWITCH_CHARSET) {
+            updateCyrillicMPSets();
+            return true;
+        }
 
         if (count == 0 && i != 0 && !KeyEvent.isModifierKey(k)) {
             long currTime = System.currentTimeMillis();
@@ -760,34 +838,6 @@ public class QwertyKeyListener extends BaseKeyListener {
         PICKER_SETS.put('=', "\u2260\u2248\u221e");
         PICKER_SETS.put('<', "\u2264\u00ab\u2039");
         PICKER_SETS.put('>', "\u2265\u00bb\u203a");
-
-        // Cyrillic/Russian
-
-        PICKER_SETS.put('\u0439', "\u0446");
-        PICKER_SETS.put('\u0419', "\u0426");
-        PICKER_SETS.put('\u0444', "\u044b");
-        PICKER_SETS.put('\u0424', "\u042b");
-        PICKER_SETS.put('\u044f', "\u0447");
-        PICKER_SETS.put('\u042f', "\u0427");
-        PICKER_SETS.put('\u0445', "\u044a");
-        PICKER_SETS.put('\u0425', "\u042a");
-        PICKER_SETS.put('\u044e', "\u003f");
-        PICKER_SETS.put('\u042e', "\u003f");
-        PICKER_SETS.put('\u0436', "\u044d");
-        PICKER_SETS.put('\u0416', "\u042d");
-        PICKER_SETS.put('\u0446', "\u0447");
-        PICKER_SETS.put('\u0426', "\u0427");
-        PICKER_SETS.put('\u0448', "\u0449");
-        PICKER_SETS.put('\u0428', "\u0429");
-        PICKER_SETS.put('\u0430', "\u044f");
-        PICKER_SETS.put('\u0410', "\u042f");
-        PICKER_SETS.put('\u0435', "\u044d");
-        PICKER_SETS.put('\u0415', "\u042d");
-        PICKER_SETS.put('\u0437', "\u0436");
-        PICKER_SETS.put('\u0417', "\u0416");
-        PICKER_SETS.put('\u0437', "\u0436");
-        PICKER_SETS.put('\u041e', "\u0401");
-        PICKER_SETS.put('\u043e', "\u0451");
 
     };
 
