@@ -1234,12 +1234,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 return true;
             }
 
-            case KeyEvent.KEYCODE_SWITCH_CHARSET: {
-                Intent intent = new Intent("hw.keycharmap.change");
-                getContext().sendBroadcast(intent);
-                return true;
-            }
-
             case KeyEvent.KEYCODE_MENU: {
                 onKeyDownPanel((featureId < 0) ? FEATURE_OPTIONS_PANEL : featureId, event);
                 return true;

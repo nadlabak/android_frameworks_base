@@ -52,7 +52,6 @@ public class KeypadText extends TextView {
             mAttached = true;
             IntentFilter filter = new IntentFilter();
             filter.addAction("hw.keycharmap.change");
-            filter.addAction(Intent.ACTION_USER_PRESENT);
             filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
         }

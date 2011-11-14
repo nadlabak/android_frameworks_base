@@ -1389,6 +1389,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     return true;
                 }
             }
+        } else if (keyCode == KeyEvent.KEYCODE_SWITCH_CHARSET) {
+            Intent intent = new Intent("hw.keycharmap.change");
+            mContext.sendBroadcast(intent);
+            return false;
         }
 
         if (keyCode == KeyEvent.KEYCODE_ENVELOPE || keyCode == KeyEvent.KEYCODE_EXPLORER
