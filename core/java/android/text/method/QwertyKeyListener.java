@@ -417,7 +417,7 @@ public class QwertyKeyListener extends BaseKeyListener {
 
         int count = event.getRepeatCount();
 
-        if (count == 0 && i == KeyEvent.KEYCODE_SWITCH_CHARSET) {
+        if (count == 0 && k == KeyEvent.KEYCODE_SWITCH_CHARSET) {
             updateCyrillicMPSets();
             return true;
         }
