@@ -1622,13 +1622,13 @@ public class ConnectivityService extends IConnectivityManager.Stub {
                     break;
 
                 case NetworkStateTracker.EVENT_NETWORK_SUBTYPE_CHANGED:
-		{
+                {
                     info = (NetworkInfo) msg.obj;
                     int netType = info.getType();
                     NetworkStateTracker thisNet = mNetTrackers[netType];
                     thisNet.updateNetworkSettings();
                     break;
-		}
+                }
                 case EVENT_RESTORE_DEFAULT_NETWORK:
                     FeatureUser u = (FeatureUser)msg.obj;
                     u.expire();
