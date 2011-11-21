@@ -62,8 +62,10 @@ public class QwertyKeyListener extends BaseKeyListener {
         if (sInstance[off] == null) {
             sInstance[off] = new QwertyKeyListener(cap, autotext);
         }
-
-        mLang = Locale.getDefault().getLanguage();
+        mLang = SystemProperties.get("persist.sys.keypad_multipress_l", "auto");
+        if (mLang.equals("auto")) {
+            mLang = Locale.getDefault().getLanguage();
+        }
         updateMPSets();
         updateCyrillicMPSets();
         return sInstance[off];
@@ -201,6 +203,14 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('a', "\u00E4");
             MP_SETS.put('o', "\u00F6");
             MP_SETS.put('s', "\u00DF");
+            MP_SETS.put('u', "\u00FC");
+        } else if (mLang.equals("de2")) {
+            MP_SETS.put('A', "\u00C4");
+            MP_SETS.put('O', "\u00D6");
+            MP_SETS.put('U', "\u00DC");
+            MP_SETS.put('a', "\u00E4");
+            MP_SETS.put('o', "\u00F6");
+            MP_SETS.put('b', "\u00DF");
             MP_SETS.put('u', "\u00FC");
         } else if (mLang.equals("es")) {
             MP_SETS.put('A', "\u00C1");
@@ -409,7 +419,10 @@ public class QwertyKeyListener extends BaseKeyListener {
         int i = event.getUnicodeChar(getMetaState(content));
         int k = event.getKeyCode();
         multiPressTimeout = SystemProperties.getInt("persist.sys.keypad_multipress_t", 500);
-        String lang = Locale.getDefault().getLanguage();
+        String lang = SystemProperties.get("persist.sys.keypad_multipress_l", "auto");
+        if (lang.equals("auto")) {
+            lang = Locale.getDefault().getLanguage();
+        }
         if (!lang.equals(mLang)) {
             mLang = lang;
             updateMPSets();
