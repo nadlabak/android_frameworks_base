@@ -736,21 +736,24 @@ public class LockPatternUtils {
             }
             where.append(") ");
         }
+
         String[] projection = new String[] {
             Calendar.EventsColumns.TITLE,
-            "begin",
+            Calendar.Instances.BEGIN,
             Calendar.EventsColumns.DESCRIPTION,
             Calendar.EventsColumns.EVENT_LOCATION,
             Calendar.EventsColumns.ALL_DAY
         };
-        String path = "instances/when/" + now + "/" + later;
-        String sort = "begin ASC";
-        Uri uri = Uri.parse("content://com.android.calendar/" + path);
+
+        Uri uri = Uri.withAppendedPath(Calendar.Instances.CONTENT_URI,
+                String.format("%d/%d", now, later));
         String nextCalendarAlarm = null;
         Cursor cursor = null;
+
         try {
             cursor = mContentResolver.query(uri,
-                    projection, where.toString(), null, sort);
+                    projection, where.toString(), null,
+                    Calendar.Instances.DEFAULT_SORT_ORDER);
 
             if (cursor != null && cursor.moveToFirst()) {
 
