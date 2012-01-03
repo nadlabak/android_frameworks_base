@@ -169,7 +169,7 @@ class ProcessList {
         StringBuilder memString = new StringBuilder();
 
         float scale = scaleMem > scaleDisp ? scaleMem : scaleDisp;
-        if (scale < 0) scale = 0;
+        if (scaleMem < 0 || scale < 0) scale = 0;
         else if (scale > 1) scale = 1;
         for (int i=0; i<mOomAdj.length; i++) {
             long low = mOomMinFreeLow[i];
