@@ -18,6 +18,7 @@
 
 #include "JNIHelp.h"
 #include "jni.h"
+#include <cutils/properties.h>
 #include <utils/Log.h>
 #include <utils/misc.h>
 
@@ -180,6 +181,25 @@ static void setIntField(JNIEnv* env, jobject obj, const char* path, jfieldID fie
     env->SetIntField(obj, fieldID, value);
 }
 
+static void setPercentageField(JNIEnv* env, jobject obj, const char* path, jfieldID fieldID)
+{
+    const int SIZE = 128;
+    char buf[SIZE];
+
+    jint value = 0;
+    if (readFromFile(path, buf, SIZE) > 0) {
+        value = atoi(buf);
+    }
+    /* sanity check for buggy drivers that provide bogus values, e.g. 103% */
+    if (value < 0) {
+        value = 0;
+    } else if (value > 100) {
+        value = 100;
+    }
+
+    env->SetIntField(obj, fieldID, value);
+}
+
 static void setVoltageField(JNIEnv* env, jobject obj, const char* path, jfieldID fieldID)
 {
     const int SIZE = 128;
@@ -200,7 +220,7 @@ static void android_server_BatteryService_update(JNIEnv* env, jobject obj)
     setBooleanField(env, obj, gPaths.usbOnlinePath, gFieldIds.mUsbOnline);
     setBooleanField(env, obj, gPaths.batteryPresentPath, gFieldIds.mBatteryPresent);
     
-    setIntField(env, obj, gPaths.batteryCapacityPath, gFieldIds.mBatteryLevel);
+    setPercentageField(env, obj, gPaths.batteryCapacityPath, gFieldIds.mBatteryLevel);
     setVoltageField(env, obj, gPaths.batteryVoltagePath, gFieldIds.mBatteryVoltage);
     setIntField(env, obj, gPaths.batteryTemperaturePath, gFieldIds.mBatteryTemperature);
     
@@ -227,6 +247,10 @@ static JNINativeMethod sMethods[] = {
 
 int register_android_server_BatteryService(JNIEnv* env)
 {
+    char value[PROPERTY_VALUE_MAX];
+    property_get("persist.sys.one_percent_batt", value, "0");
+    bool mOnePercentBatt = atoi(value) == 1;
+
     char    path[PATH_MAX];
     struct dirent* entry;
 
@@ -270,7 +294,9 @@ int register_android_server_BatteryService(JNIEnv* env)
                     snprintf(path, sizeof(path), "%s/%s/present", POWER_SUPPLY_PATH, name);
                     if (access(path, R_OK) == 0)
                         gPaths.batteryPresentPath = strdup(path);
-                    snprintf(path, sizeof(path), "%s/%s/capacity", POWER_SUPPLY_PATH, name);
+                    if (mOnePercentBatt)
+                        snprintf(path, sizeof(path), "%s/%s/charge_counter", POWER_SUPPLY_PATH, name);
+                    else snprintf(path, sizeof(path), "%s/%s/capacity", POWER_SUPPLY_PATH, name);
                     if (access(path, R_OK) == 0)
                         gPaths.batteryCapacityPath = strdup(path);
 
