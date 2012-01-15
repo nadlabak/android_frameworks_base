@@ -91,6 +91,7 @@ public class RingSelector extends ViewGroup {
      */
     private int mOrientation;
     private int mSelectedRingId;
+    private int mHighlightBackgroundResId;
     private Ring mLeftRing;
     private Ring mRightRing;
     private Ring mMiddleRing;
@@ -724,6 +725,8 @@ public class RingSelector extends ViewGroup {
         mSecRingBottomOffset = (int) (mDensity * mDensityScaleFactor * mSecRingBottomOffsetDIP);
         mSecRingCenterOffset = (int) (mDensity * mDensityScaleFactor * mSecRingCenterOffsetDIP);
 
+        mHighlightBackgroundResId = R.drawable.jog_ring_ring_pressed_red;
+
         mSecRings = new SecRing[] {
                 new SecRing(this, resSecNorm),
                 new SecRing(this, resSecNorm),
@@ -1059,16 +1062,18 @@ public class RingSelector extends ViewGroup {
             }
         }
         if (ringsTouched && !mPrevTriggered) {
-            int ringlockStyle = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Bubble));
-            int resHighlight = (ringlockStyle == RinglockStyle.getIdByStyle(RinglockStyle.Bubble) ?
-                    R.drawable.jog_ring_ring_pressed_red : R.drawable.jog_ring_rev_ring_pressed_red);
-
-            mCurrentRing.setHighlighted(resHighlight);
+            mCurrentRing.setHighlighted(mHighlightBackgroundResId);
             mPrevTriggered = true;
         } else if (!ringsTouched && mPrevTriggered) {
             mCurrentRing.setHighlighted(0);
             mPrevTriggered = false;
+        }
+    }
+
+    public void setHighlightBackgroundResource(int backgroundId) {
+        mHighlightBackgroundResId = backgroundId;
+        if (mPrevTriggered) {
+            mCurrentRing.setHighlighted(backgroundId);
         }
     }
 
