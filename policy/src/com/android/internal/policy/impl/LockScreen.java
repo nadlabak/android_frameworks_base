@@ -625,7 +625,6 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         } else {
             //no middle ring
             mRingSelector.setLeftRingResources(resUnlock, resTarget, resRingGreen);
->>>>>>> upstream/gingerbread
             mRingSelector.enableRingMinimal(false);
         }
 
