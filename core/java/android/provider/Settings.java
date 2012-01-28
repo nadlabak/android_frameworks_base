@@ -1204,6 +1204,12 @@ public final class Settings {
         public static final String AIRPLANE_MODE_TOGGLEABLE_RADIOS = "airplane_mode_toggleable_radios";
 
         /**
+         * Whether Bluetooth fast connections are enabled.
+         * @hide
+         */
+        public static final String BLUETOOTH_FAST_CONNECT = "bluetooth_fast_connect";
+
+        /**
          * The policy for deciding when Wi-Fi should go to sleep (which will in
          * turn switch to using the mobile data as an Internet connection).
          * <p>
@@ -2257,6 +2263,23 @@ public final class Settings {
          * @hide
          */
         public static final String LOCK_MMS_IN_MEMORY = "lock_mms_in_memory";
+
+        /**
+         * What text to show as carrier label
+         * 0: use system default
+         * 1: show spn
+         * 2: show plmn
+         * 3: show custom string
+         * default: 0
+         * @hide
+         */
+        public static final String CARRIER_LABEL_TYPE = "carrier_label_type";
+
+        /**
+         * The custom string to show as carrier label
+         * @hide
+         */
+        public static final String CARRIER_LABEL_CUSTOM_STRING = "carrier_label_custom_string";
 
         /**
          * Display style of AM/PM next to clock in status bar
