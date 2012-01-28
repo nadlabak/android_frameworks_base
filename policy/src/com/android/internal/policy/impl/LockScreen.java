@@ -738,32 +738,32 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         }
 
         resetStatusInfo(updateMonitor);
-        switch (mWidgetLayout) {
-            case 2:
-                centerWidgets();
-                break;
-            case 3:
-                alignWidgetsToRight();
-                break;
+        if (mCreationOrientation != Configuration.ORIENTATION_LANDSCAPE) {
+            switch (mWidgetLayout) {
+                case 2:
+                    centerWidgets();
+                    break;
+                case 3:
+                    alignWidgetsToRight();
+                    break;
+            }
         }
     }
 
     private void centerWidgets() {
-        if (mCreationOrientation != Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams layoutParams;
-            layoutParams = (RelativeLayout.LayoutParams) mCarrier.getLayoutParams();
-            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-            mCarrier.setLayoutParams(layoutParams);
-            mCarrier.setGravity(Gravity.CENTER_HORIZONTAL);
+        RelativeLayout.LayoutParams layoutParams;
+        layoutParams = (RelativeLayout.LayoutParams) mCarrier.getLayoutParams();
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        mCarrier.setLayoutParams(layoutParams);
+        mCarrier.setGravity(Gravity.CENTER_HORIZONTAL);
 
-            mStatusBox.setGravity(Gravity.CENTER_HORIZONTAL);
+        mStatusBox.setGravity(Gravity.CENTER_HORIZONTAL);
 
-            centerWidget(mClock);
-            centerWidget(mDate);
-            centerWidget(mStatusCharging);
-            centerWidget(mStatusAlarm);
-            centerWidget(mStatusCalendar);
-        }
+        centerWidget(mClock);
+        centerWidget(mDate);
+        centerWidget(mStatusCharging);
+        centerWidget(mStatusAlarm);
+        centerWidget(mStatusCalendar);
     }
 
     private void centerWidget(View view) {
