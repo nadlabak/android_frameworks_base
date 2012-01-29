@@ -89,8 +89,6 @@ public final class SIMRecords extends IccRecords {
 
     String pnnHomeName = null;
 
-    private boolean forcePlmnDisplay;
-
     // ***** Constants
 
     // Bitmasks for SPN display rules.
@@ -1386,8 +1384,8 @@ public final class SIMRecords extends IccRecords {
         } else if (isOnMatchingPlmn(plmn)) {
             // registered PLMN is either HPLMN or a PLMN in the EF_SPDI list.
             rule = SPN_RULE_SHOW_SPN;
-            if ((spnDisplayCondition & 0x01) == 0x01 || forcePlmnDisplay) {
-                // ONS required when registered to HPLMN or PLMN in EF_SPDI or forced by user preference
+            if ((spnDisplayCondition & 0x01) == 0x01) {
+                // ONS required when registered to HPLMN or PLMN in EF_SPDI
                 rule |= SPN_RULE_SHOW_PLMN;
             }
         } else {
@@ -1409,16 +1407,12 @@ public final class SIMRecords extends IccRecords {
         if (plmn == null) return false;
 
         if (plmn.equals(getSIMOperatorNumeric())) {
-            forcePlmnDisplay = false;
             return true;
         }
 
         if (spdiNetworks != null) {
             for (String spdiNet : spdiNetworks) {
                 if (plmn.equals(spdiNet)) {
-                    forcePlmnDisplay = android.provider.Settings.System.getInt(
-                        phone.getContext().getContentResolver(),
-                        android.provider.Settings.System.STATUS_BAR_FORCE_PLMN_DISPLAY, 0) == 1;
                     return true;
                 }
             }

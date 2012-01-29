@@ -2505,13 +2505,6 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_TOGGLE = "status_bar_brightness_toggle";
 
         /**
-         * Whether to force PLMN display for SPDI networks
-         *
-         * @hide
-         */
-        public static final String STATUS_BAR_FORCE_PLMN_DISPLAY = "status_bar_force_plmn_display";
-
-        /**
          * Whether to display headset icon on status bar when headset is plugged in
          * 0: headset icon is never displayed
          * 1: headset icon is displayed when headset is plugged in
