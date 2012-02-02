@@ -331,6 +331,15 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
     boolean mStackFromBottom;
 
     /**
+     * Indicates whether to system-wide-override to enable/disable or not.
+     * 0 = force to enable scrollingCacheEnabled regardless of app setting
+     * 1 = default is to enable scrollingCacheEnabled unless app specifies
+     * 2 = default is to disable scrollingCacheEnabled unless app specifies
+     * 3 = force to disable scrollingCacheEnabled regardless of app setting
+     */
+    int mScrollingCacheProperty = SystemProperties.getInt("persist.sys.scrollingcache",1);
+
+    /**
      * When set to true, the list automatically discards the children's
      * bitmap cache after scrolling.
      */
@@ -619,9 +628,8 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         boolean stackFromBottom = a.getBoolean(R.styleable.AbsListView_stackFromBottom, false);
         setStackFromBottom(stackFromBottom);
 
-        int scrollingCacheProp = SystemProperties.getInt("persist.sys.scrollingcache",1);
         boolean scrollingCacheEnabled = true;
-        switch(scrollingCacheProp) {
+        switch(mScrollingCacheProperty) {
         case 0:
             scrollingCacheEnabled = true;
             break;
@@ -662,8 +670,7 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
         setFocusableInTouchMode(true);
         setWillNotDraw(false);
         setAlwaysDrawnWithCacheEnabled(false);
-        int scrollingCacheProp = SystemProperties.getInt("persist.sys.scrollingcache",1);
-        boolean scrollingCacheEnabled = ((scrollingCacheProp == 2 || scrollingCacheProp == 3) ? false : true);
+        boolean scrollingCacheEnabled = (mScrollingCacheProperty < 2);
         setScrollingCacheEnabled(scrollingCacheEnabled);
 
         final ViewConfiguration configuration = ViewConfiguration.get(mContext);
