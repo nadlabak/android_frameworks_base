@@ -308,7 +308,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('N', "\u0143");
             MP_SETS.put('O', "\u00D3");
             MP_SETS.put('S', "\u015A");
-            MP_SETS.put('Z', "\u0179\u017B");
+            MP_SETS.put('X', "\u0179");
+            MP_SETS.put('Z', "\u017B\u0179");
             MP_SETS.put('a', "\u0105");
             MP_SETS.put('c', "\u0107");
             MP_SETS.put('e', "\u0119");
@@ -316,7 +317,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('n', "\u0144");
             MP_SETS.put('o', "\u00F3");
             MP_SETS.put('s', "\u015B");
-            MP_SETS.put('z', "\u017A\u017C");
+            MP_SETS.put('x', "\u017A");
+            MP_SETS.put('z', "\u017C\u017A");
         } else if (mLang.equals("pt")) {
             MP_SETS.put('A', "\u00C3\u00C1\u00C2\u00C0");
             MP_SETS.put('C', "\u00C7");
