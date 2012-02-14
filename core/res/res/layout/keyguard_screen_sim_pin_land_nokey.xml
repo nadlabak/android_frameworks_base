@@ -75,7 +75,7 @@
                 android:textSize="32sp"
                 android:inputType="textPassword"
             />
-    
+
             <ImageButton android:id="@+id/backspace"
                  android:src="@android:drawable/ic_input_delete"
                  android:layout_width="wrap_content"
