@@ -26,16 +26,16 @@ import com.android.internal.telephony.gsm.SuppServiceNotification;
 import java.util.ArrayList;
 
 /**
- * Motorola Jordan RIL class
+ * Motorola Wrigley 3G RIL class
  *
  * {@hide}
  */
-public class MotoJordanRIL extends RIL implements CommandsInterface {
-    public MotoJordanRIL(Context context) {
+public class MotoWrigley3GRIL extends RIL implements CommandsInterface {
+    public MotoWrigley3GRIL(Context context) {
         super(context);
     }
 
-    public MotoJordanRIL(Context context, int networkMode, int cdmaSubscription) {
+    public MotoWrigley3GRIL(Context context, int networkMode, int cdmaSubscription) {
         super(context, networkMode, cdmaSubscription);
     }
 
