@@ -3180,7 +3180,7 @@ public class WindowManagerService extends IWindowManager.Stub
      * android.os.IBinder)
      */
     boolean updateOrientationFromAppTokensLocked(boolean inTransaction) {
-        if (mDisplayFrozen || mOpeningApps.size() > 0 || mClosingApps.size() > 0) {
+        if (mDisplayFrozen) {
             // If the display is frozen, some activities may be in the middle
             // of restarting, and thus have removed their old window.  If the
             // window has the flag to hide the lock screen, then the lock screen
