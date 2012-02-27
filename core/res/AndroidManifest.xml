@@ -448,6 +448,7 @@
         android:label="@string/permlab_recordAudio"
         android:description="@string/permdesc_recordAudio" />
 
+    <!-- @hide -->
     <permission android:name="android.permission.RAW_AUDIO"
         android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
         android:protectionLevel="dangerous"
@@ -467,7 +468,8 @@
         android:label="@string/permlab_camera"
         android:description="@string/permdesc_camera" />
 
-    <!-- Allows an application to override the power key action -->
+    <!-- Allows an application to override the power key action
+         @hide -->
     <permission android:name="android.permission.PREVENT_POWER_KEY"
         android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
         android:protectionLevel="dangerous"
@@ -1391,6 +1393,12 @@
 
         <service android:name="com.android.internal.service.wallpaper.ImageWallpaper"
                 android:permission="android.permission.BIND_WALLPAPER">
+        </service>
+
+        <service android:name="com.authentec.GfxEngineRelayService">
+            <intent-filter>
+                <action android:name="com.authentec.Keyguard" />
+            </intent-filter>
         </service>
 
         <receiver android:name="com.android.server.BootReceiver" >
