@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The CyanogenMod Project
+ * Copyright (C) 2012 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@ import com.android.internal.telephony.gsm.SuppServiceNotification;
 import java.util.ArrayList;
 
 /**
- * Motorola Wrigley 3G RIL class
+ * RIL class for Motorola Wrigley 3G RILs which need
+ * supplementary service notification post-processing
  *
  * {@hide}
  */
-public class MotoWrigley3GRIL extends RIL implements CommandsInterface {
+public class MotoWrigley3GRIL extends RIL {
     public MotoWrigley3GRIL(Context context) {
         super(context);
     }
@@ -53,10 +54,14 @@ public class MotoWrigley3GRIL extends RIL implements CommandsInterface {
         /**
          * Moto's RIL seems to confuse code2 0 ('forwarded call') and
          * 10 ('additional incoming call forwarded') and sends 10 when an
-         * incoming call is forwarded and _no_ call is currently active
+         * incoming call is forwarded and _no_ call is currently active.
+         * It never sends 10 where it would be appropriate, so it's safe
+         * to just convert every occurence of 10 to 0.
          */
-        if (notification.notificationType == 1 && notification.code == 10) {
-            notification.code = 0;
+        if (notification.notificationType == SuppServiceNotification.NOTIFICATION_TYPE_MT) {
+            if (notification.code == SuppServiceNotification.MT_CODE_ADDITIONAL_CALL_FORWARDED) {
+                notification.code = SuppServiceNotification.MT_CODE_FORWARDED_CALL;
+            }
         }
 
         return notification;

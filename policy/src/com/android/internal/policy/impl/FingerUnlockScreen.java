@@ -167,7 +167,7 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
 
     static Thread mExecutionThread = null;
     private Thread mUiThread;
-    private boolean mbFeedbackDelivered = false;
+    private boolean mbInvalidSwipe = false;
     private VerifyRunner mVerifyRunner = new VerifyRunner();
     private Context m_Context;
 
@@ -924,6 +924,12 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
 
             try {
                 switch (iResult) {
+                    case AuthentecHelper.eAM_STATUS_NO_STORED_CREDENTIAL:
+                        // Might happen if the user wipes their database
+                        // and the fingerprint unlock method remains active.
+                        // Let it continue with the OK case so screen unlocks
+                        if (DEBUG) Log.d(TAG,"No stored credential");
+
                     case AuthentecHelper.eAM_STATUS_OK:
                         m_bVerifyied = true;
                         if (DEBUG) Log.d(TAG,"keyguardDone, m_bVerifyied=" + m_bVerifyied);
@@ -939,12 +945,6 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
 
                     case AuthentecHelper.eAM_STATUS_CREDENTIAL_LOCKED:
                         // When m_bPaused becomes true.
-                        bRetryAfterLockout = true;
-                        break;
-
-                    case AuthentecHelper.eAM_STATUS_NO_STORED_CREDENTIAL:
-                        // Should never happen.
-                        if (DEBUG) Log.d(TAG,"No stored credential");
                         bRetryAfterLockout = true;
                         break;
 
@@ -964,7 +964,7 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
                         break;
 
                     case AuthentecHelper.eAM_STATUS_UNKNOWN_ERROR:
-                        Log.e(TAG, "Unkown error!");
+                        Log.e(TAG, "Unknown error!");
                         bRetryAfterLockout = true;
                         break;
 
@@ -1117,11 +1117,11 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
         /* we've already displayed the feedback, so we don't want to worry */
         /* about an additional message.                                    */
         if (target.equals("swipe_bad")) {
-            // Update the total failed attempts.
-            mTotalFailedPatternAttempts++;
-            mFailedPatternAttemptsSinceLastTimeout++;
+            if (!mbInvalidSwipe) {
+                // Update the total failed attempts.
+                mTotalFailedPatternAttempts++;
+                mFailedPatternAttemptsSinceLastTimeout++;
 
-            if (!mbFeedbackDelivered) {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         toast(getContext().getString(R.string.keyguard_finger_not_match));
@@ -1135,71 +1135,55 @@ class FingerUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
                     }
                 });
             } else {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        mCallback.reportFailedUnlockAttempt();
-                        if (mFailedPatternAttemptsSinceLastTimeout >=
-                                LockPatternUtils.FAILED_ATTEMPTS_BEFORE_TIMEOUT) {
-                            pokeWakelock(1000);
-                            long deadline = mLockPatternUtils.setLockoutAttemptDeadline();
-                            handleAttemptLockout(deadline);
-                        }
-                    }
-                });
+                mbInvalidSwipe = false;
             }
 
-            mbFeedbackDelivered = false;
             return;
         }
 
         /* if the target is any of our feedback messages, provide a toast... */
         if (target.equals("swipe_too_fast")) {
-            mbFeedbackDelivered = true;
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_fast));
                 }
             });
             return;
-        }
-        if (target.equals("swipe_too_slow")) {
-            mbFeedbackDelivered = true;
+        } else if (target.equals("swipe_too_slow")) {
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_slow));
                 }
             });
             return;
-        }
-        if (target.equals("swipe_too_short")) {
-            mbFeedbackDelivered = true;
+        } else if (target.equals("swipe_too_short")) {
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_short));
                 }
             });
             return;
-        }
-        if (target.equals("swipe_too_skewed")) {
-            mbFeedbackDelivered = true;
+        } else if (target.equals("swipe_too_skewed")) {
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_skewed));
                 }
             });
             return;
-        }
-        if (target.equals("swipe_too_far_left")) {
-            mbFeedbackDelivered = true;
+        } else if (target.equals("swipe_too_far_left")) {
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_far_left));
                 }
             });
             return;
-        }
-        if (target.equals("swipe_too_far_right")) {
-            mbFeedbackDelivered = true;
+        } else if (target.equals("swipe_too_far_right")) {
+            mbInvalidSwipe = true;
             runOnUiThread(new Runnable() {
                 public void run() {
                     toast(getContext().getString(R.string.keyguard_finger_swipe_too_far_right));
