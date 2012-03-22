@@ -352,7 +352,7 @@ public final class ActivityManagerService extends ActivityManagerNative
     static final String KEEP_APP_1;
     static final String KEEP_APP_2;
 
-    static final boolean GMAPS_HACK;
+    static boolean GMAPS_HACK;
     static final String GMAPS_NLS = 
             "com.google.android.apps.maps/com.google.android.location.internal.server.NetworkLocationService";
     
@@ -9005,6 +9005,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         //Slog.i(TAG, "Bring up service:");
         //r.dump("  ");
 
+        GMAPS_HACK = "1".equals(SystemProperties.get("persist.sys.gmaps_hack", "0"));
         if (GMAPS_HACK && r.shortName.equals(GMAPS_NLS)
                 && getProcessRecordLocked("com.google.android.apps.maps",
                 r.appInfo.uid) == null) {
