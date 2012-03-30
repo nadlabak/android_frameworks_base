@@ -81,7 +81,11 @@ status_t EGLUtils::selectConfigForPixelFormat(
     for (i=0 ; i<n ; i++) {
         EGLint nativeVisualId = 0;
         eglGetConfigAttrib(dpy, configs[i], EGL_NATIVE_VISUAL_ID, &nativeVisualId);
+#ifndef NO_RGBX_8888
+        if (nativeVisualId>0 && format == nativeVisualId) {
+#else
         if (nativeVisualId>0 && (format & 1) == (nativeVisualId & 1)) {
+#endif
             config = configs[i];
             break;
         }
