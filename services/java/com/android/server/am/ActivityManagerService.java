@@ -13854,6 +13854,12 @@ public final class ActivityManagerService extends ActivityManagerNative
             adj = ProcessList.FOREGROUND_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
             app.adjType = "exec-service";
+        } else if (app.processName.equals("com.android.mms") && app.services.size() != 0) {
+            // When SmsReceiverService is running, it does important work. So treat
+            // Mms app as being in the foreground to prevent loss of messsages.
+            adj = ProcessList.FOREGROUND_APP_ADJ;
+            schedGroup = Process.THREAD_GROUP_DEFAULT;
+            app.adjType = "sms-service";
         } else if (activitiesSize > 0) {
             // This app is in the background with paused activities.
             // We inspect activities to potentially upgrade adjustment further below.
