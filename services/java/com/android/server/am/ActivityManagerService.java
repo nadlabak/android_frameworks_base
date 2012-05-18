@@ -17,7 +17,6 @@
 package com.android.server.am;
 
 import com.android.internal.R;
-import com.android.internal.app.ThemeUtils;
 import com.android.internal.os.BatteryStatsImpl;
 import com.android.server.AttributeCache;
 import com.android.server.IntentResolver;
@@ -798,7 +797,6 @@ public final class ActivityManagerService extends ActivityManagerNative
     boolean mLaunchWarningShown = false;
 
     Context mContext;
-    Context mUiContext;
 
     int mFactoryTest;
 
@@ -1017,7 +1015,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                                 }
                             }
                         }
-                        Dialog d = new AppErrorDialog(getUiContext(), res, proc, hasRevoked);
+                        Dialog d = new AppErrorDialog(mContext, res, proc, hasRevoked);
                         d.show();
                         proc.crashDialog = d;
                     } else {
@@ -1047,7 +1045,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                             false, false, MY_PID, Process.SYSTEM_UID);
 
                     Dialog d = new AppNotRespondingDialog(ActivityManagerService.this,
-                            getUiContext(), proc, (ActivityRecord)data.get("activity"));
+                            mContext, proc, (ActivityRecord)data.get("activity"));
                     d.show();
                     proc.anrDialog = d;
                 }
@@ -1068,7 +1066,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                     }
                     AppErrorResult res = (AppErrorResult) data.get("result");
                     if (!mSleeping && !mShuttingDown) {
-                        Dialog d = new StrictModeViolationDialog(getUiContext(), res, proc);
+                        Dialog d = new StrictModeViolationDialog(mContext, res, proc);
                         d.show();
                         proc.crashDialog = d;
                     } else {
@@ -1081,7 +1079,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             } break;
             case SHOW_FACTORY_ERROR_MSG: {
                 Dialog d = new FactoryErrorDialog(
-                    getUiContext(), msg.getData().getCharSequence("msg"));
+                    mContext, msg.getData().getCharSequence("msg"));
                 d.show();
                 ensureBootCompleted();
             } break;
@@ -1101,7 +1099,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                         if (!app.waitedForDebugger) {
                             Dialog d = new AppWaitingForDebuggerDialog(
                                     ActivityManagerService.this,
-                                    getUiContext(), app);
+                                    mContext, app);
                             app.waitDialog = d;
                             app.waitedForDebugger = true;
                             d.show();
@@ -1150,7 +1148,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             } break;
             case SHOW_UID_ERROR_MSG: {
                 // XXX This is a temporary dialog, no need to localize.
-                AlertDialog d = new BaseErrorDialog(getUiContext());
+                AlertDialog d = new BaseErrorDialog(mContext);
                 d.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ERROR);
                 d.setCancelable(false);
                 d.setTitle("System UIDs Inconsistent");
@@ -1219,7 +1217,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                     notification.defaults = 0; // please be quiet
                     notification.sound = null;
                     notification.vibrate = null;
-                    notification.setLatestEventInfo(getUiContext(), text,
+                    notification.setLatestEventInfo(context, text,
                             mContext.getText(R.string.heavy_weight_notification_detail),
                             PendingIntent.getActivity(mContext, 0, root.intent,
                                     PendingIntent.FLAG_CANCEL_CURRENT));
@@ -1627,15 +1625,6 @@ public final class ActivityManagerService extends ActivityManagerNative
             synchronized(mPidsSelfLocked) {
                 mOnBattery = DEBUG_POWER ? true : onBattery;
             }
-        }
-    }
-
-    private Context getUiContext() {
-        synchronized (this) {
-            if (mUiContext == null && mBooted) {
-                mUiContext = ThemeUtils.createUiContext(mContext);
-            }
-            return mUiContext != null ? mUiContext : mContext;
         }
     }
 
@@ -3029,7 +3018,7 @@ public final class ActivityManagerService extends ActivityManagerNative
                 @Override
                 public void run() {
                     synchronized (ActivityManagerService.this) {
-                        final Dialog d = new LaunchWarningWindow(getUiContext(), cur, next);
+                        final Dialog d = new LaunchWarningWindow(mContext, cur, next);
                         d.show();
                         mHandler.postDelayed(new Runnable() {
                             @Override
@@ -3738,12 +3727,6 @@ public final class ActivityManagerService extends ActivityManagerNative
                 }
             }
         }, pkgFilter);
-        ThemeUtils.registerThemeChangeReceiver(mContext, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mUiContext = null;
-            }
-        });
         
         synchronized (this) {
             // Ensure that any processes we had put on hold are now started
