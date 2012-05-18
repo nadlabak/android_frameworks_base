@@ -11620,14 +11620,12 @@ public final class ActivityManagerService extends ActivityManagerNative
         int adj;
         int schedGroup;
         int N;
-        if ("com.android.mms".equals(app.processName) &&
-            Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.LOCK_MMS_IN_MEMORY, 1) == 1 ) {
-            // MMS can die in situations of heavy memory pressure.
-            // Always push it to the top.
+        if (app.processName.equals("com.android.mms") && app.services.size() != 0 ) {
+            // When SmsReceiverService is running, it does important work. So treat
+            // Mms app as being in the foreground to prevent loss of messsages.
             adj = FOREGROUND_APP_ADJ;
             schedGroup = Process.THREAD_GROUP_DEFAULT;
-            app.adjType = "mms";
+            app.adjType = "sms-service";
         } else if (KEEP_APP_1.equals(app.processName) || KEEP_APP_2.equals(app.processName)) {
             // apps to be kept running
             adj = FOREGROUND_APP_ADJ;
