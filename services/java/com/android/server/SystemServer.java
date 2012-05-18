@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
- * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +34,6 @@ import android.content.ContentService;
 import android.content.ContextWrapper;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.IPackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -507,13 +505,6 @@ class ServerThread extends Thread {
                 Slog.e(TAG, "Failure starting DiskStats Service", e);
             }
 
-            try {
-                Slog.i(TAG, "AssetRedirectionManager Service");
-                ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
-            } catch (Throwable e) {
-                Slog.e(TAG, "Failure starting AssetRedirectionManager Service", e);
-            }
-
             String[] vendorServices = context.getResources().getStringArray(
                     com.android.internal.R.array.config_vendorServices);
 
@@ -611,15 +602,6 @@ class ServerThread extends Thread {
             pm.systemReady();
         } catch (RemoteException e) {
         }
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE_RESET);
-        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addCategory(Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE);
-        filter.addDataScheme("package");
-        context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
 
         // These are needed to propagate to the runnable below.
         final StatusBarManagerService statusBarF = statusBar;

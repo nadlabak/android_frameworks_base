@@ -136,13 +136,7 @@ public class CompatibilityInfo {
      */
     public final int appFlags;
     
-    /**
-     * Whether the application supports third-party theming.
-     */
-    public final boolean isThemeable;
-
     public CompatibilityInfo(ApplicationInfo appInfo) {
-        isThemeable = appInfo.isThemeable;
         appFlags = appInfo.flags;
         
         if ((appInfo.flags & ApplicationInfo.FLAG_SUPPORTS_LARGE_SCREENS) != 0) {
@@ -175,13 +169,12 @@ public class CompatibilityInfo {
     }
 
     private CompatibilityInfo(int appFlags, int compFlags,
-            int dens, float scale, float invertedScale, boolean isThemeable) {
+            int dens, float scale, float invertedScale) {
         this.appFlags = appFlags;
         mCompatibilityFlags = compFlags;
         applicationDensity = dens;
         applicationScale = scale;
         applicationInvertedScale = invertedScale;
-        this.isThemeable = isThemeable;
     }
 
     private CompatibilityInfo() {
@@ -193,8 +186,7 @@ public class CompatibilityInfo {
                 EXPANDABLE | CONFIGURED_EXPANDABLE,
                 DisplayMetrics.DENSITY_DEVICE,
                 1.0f,
-                1.0f,
-                true);
+                1.0f);
     }
 
     /**
@@ -202,7 +194,7 @@ public class CompatibilityInfo {
      */
     public CompatibilityInfo copy() {
         CompatibilityInfo info = new CompatibilityInfo(appFlags, mCompatibilityFlags,
-                applicationDensity, applicationScale, applicationInvertedScale, isThemeable);
+                applicationDensity, applicationScale, applicationInvertedScale);
         return info;
     }
  
