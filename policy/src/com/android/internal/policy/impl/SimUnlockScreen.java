@@ -72,20 +72,20 @@ public class SimUnlockScreen extends LinearLayout implements KeyguardScreen, Vie
 
     private static final char[] DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
+    private BroadcastReceiver mThemeChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mUiContext = null;
+            context.unregisterReceiver(this);
+        }
+    };
+
     public SimUnlockScreen(Context context, Configuration configuration,
             KeyguardUpdateMonitor updateMonitor, KeyguardScreenCallback callback,
             LockPatternUtils lockpatternutils) {
         super(context);
         mUpdateMonitor = updateMonitor;
         mCallback = callback;
-
-        ThemeUtils.registerThemeChangeReceiver(context, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mUiContext = null;
-                mSimUnlockProgressDialog = null;
-            }
-        });
 
         mCreationOrientation = configuration.orientation;
         mKeyboardHidden = configuration.hardKeyboardHidden;
@@ -127,7 +127,10 @@ public class SimUnlockScreen extends LinearLayout implements KeyguardScreen, Vie
 
     /** {@inheritDoc} */
     public void onPause() {
-
+        if (mUiContext != null) {
+            mContext.unregisterReceiver(mThemeChangeReceiver);
+            mUiContext = null;
+        }
     }
 
     /** {@inheritDoc} */
@@ -210,11 +213,17 @@ public class SimUnlockScreen extends LinearLayout implements KeyguardScreen, Vie
         }
 
         if (mSimUnlockProgressDialog == null) {
+            final Context context;
+
             mUiContext = ThemeUtils.createUiContext(mContext);
+            if (mUiContext != null) {
+                context = mUiContext;
+                ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
+            } else {
+                context = mContext;
+            }
 
-            final Context uiContext = mUiContext != null ? mUiContext : mContext;
-
-            mSimUnlockProgressDialog = new ProgressDialog(uiContext);
+            mSimUnlockProgressDialog = new ProgressDialog(context);
             mSimUnlockProgressDialog.setMessage(
                     mContext.getString(R.string.lockscreen_sim_unlock_progress_dialog_message));
             mSimUnlockProgressDialog.setIndeterminate(true);

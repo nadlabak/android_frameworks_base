@@ -81,6 +81,14 @@ public class AccountUnlockScreen extends RelativeLayout implements KeyguardScree
     private Context mUiContext;
     private ProgressDialog mCheckingDialog;
 
+    private BroadcastReceiver mThemeChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mUiContext = null;
+            context.unregisterReceiver(this);
+        }
+    };
+
     /**
      * AccountUnlockScreen constructor.
      * @param configuration
@@ -92,14 +100,6 @@ public class AccountUnlockScreen extends RelativeLayout implements KeyguardScree
         super(context);
         mCallback = callback;
         mLockPatternUtils = lockPatternUtils;
-
-        ThemeUtils.registerThemeChangeReceiver(context, new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mUiContext = null;
-                mCheckingDialog = null;
-            }
-        });
 
         LayoutInflater.from(context).inflate(
                 R.layout.keyguard_screen_glogin_unlock, this, true);
@@ -153,7 +153,10 @@ public class AccountUnlockScreen extends RelativeLayout implements KeyguardScree
 
     /** {@inheritDoc} */
     public void onPause() {
-
+        if (mUiContext != null) {
+            mContext.unregisterReceiver(mThemeChangeReceiver);
+            mUiContext = null;
+        }
     }
 
     /** {@inheritDoc} */
@@ -327,9 +330,15 @@ public class AccountUnlockScreen extends RelativeLayout implements KeyguardScree
         }
 
         if (mCheckingDialog == null) {
-            mUiContext = ThemeUtils.createUiContext(mContext);
+            final Context context;
 
-            final Context context = mUiContext != null ? mUiContext : mContext;
+            mUiContext = ThemeUtils.createUiContext(mContext);
+            if (mUiContext != null) {
+                context = mUiContext;
+                ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
+            } else {
+                context = mContext;
+            }
 
             mCheckingDialog = new ProgressDialog(context);
             mCheckingDialog.setMessage(

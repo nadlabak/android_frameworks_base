@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.RegistrantList;
 import android.os.Registrant;
+import android.os.SystemProperties;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.util.Log;
@@ -294,6 +295,27 @@ public final class CallManager {
      * @return true if register successfully
      */
     public boolean registerPhone(Phone phone) {
+        return this.registerPhoneInternal(phone, false);
+    }
+
+    /**
+     * Register phone to CallManager and force it as the default phone
+     *
+     * @param phone to be registered
+     * @return true if register successfully
+     */
+    public boolean registerPhoneAsDefault(Phone phone) {
+        return this.registerPhoneInternal(phone, true);
+    }
+
+    /**
+     * Internal phone registration function used in two phone registering cases
+     *
+     * @param phone to be registered
+     * @param overrideDefaultPhone is there a need to set this phone to be the default one
+     * @return true if register successfully
+     */
+    private boolean registerPhoneInternal(Phone phone, boolean overrideDefaultPhone) {
         Phone basePhone = getPhoneBase(phone);
 
         if (basePhone != null && !mPhones.contains(basePhone)) {
@@ -303,7 +325,7 @@ public final class CallManager {
                         phone.getPhoneName() + " " + phone + ")");
             }
 
-            if (mPhones.isEmpty()) {
+            if (mPhones.isEmpty() || overrideDefaultPhone) {
                 mDefaultPhone = basePhone;
             }
             mPhones.add(basePhone);
@@ -405,6 +427,20 @@ public final class CallManager {
                 }
                 break;
         }
+
+        // Some samsung devices need a special parameter "realcall" set for incall audio
+        boolean mSamsungRealCall = SystemProperties.getBoolean("ro.telephony.samsung.realcall", false);
+
+        if(mSamsungRealCall == true) {
+            if (mode == AudioManager.MODE_IN_CALL) {
+                Log.d(LOG_TAG, "setAudioMode(): realcall=on");
+                audioManager.setParameters("realcall=on");
+            } else if (mode == AudioManager.MODE_NORMAL) {
+                Log.d(LOG_TAG, "setAudioMode(): realcall=off");
+                audioManager.setParameters("realcall=off");
+            }
+        }
+
         // calling audioManager.setMode() multiple times in a short period of
         // time seems to break the audio recorder in in-call mode
         if (audioManager.getMode() != mode) audioManager.setMode(mode);
