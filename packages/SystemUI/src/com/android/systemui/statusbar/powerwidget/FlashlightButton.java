@@ -20,8 +20,8 @@ public class FlashlightButton extends PowerButton {
     public FlashlightButton() { mType = BUTTON_FLASHLIGHT; }
 
     @Override
-    protected void updateState(Context context) {
-        boolean enabled = Settings.System.getInt(context.getContentResolver(), Settings.System.TORCH_STATE, 0) == 1;
+    protected void updateState() {
+        boolean enabled = Settings.System.getInt(mView.getContext().getContentResolver(), Settings.System.TORCH_STATE, 0) == 1;
         if(enabled) {
             mIcon = R.drawable.stat_flashlight_on;
             mState = STATE_ENABLED;
@@ -32,7 +32,8 @@ public class FlashlightButton extends PowerButton {
     }
 
     @Override
-    protected void toggleState(Context context) {
+    protected void toggleState() {
+        Context context = mView.getContext();
         boolean bright = Settings.System.getInt(context.getContentResolver(),
                 Settings.System.EXPANDED_FLASH_MODE, 0) == 1;
         Intent i = new Intent("net.cactii.flash2.TOGGLE_FLASHLIGHT");
@@ -41,13 +42,13 @@ public class FlashlightButton extends PowerButton {
     }
 
     @Override
-    protected boolean handleLongClick(Context context) {
+    protected boolean handleLongClick() {
         // it may be better to make an Intent action for the Torch
         // we may want to look at that option later
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClassName("net.cactii.flash2", "net.cactii.flash2.MainActivity");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        mView.getContext().startActivity(intent);
         return true;
     }
 

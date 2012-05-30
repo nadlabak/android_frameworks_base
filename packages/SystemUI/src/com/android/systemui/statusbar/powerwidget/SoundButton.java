@@ -70,13 +70,13 @@ public class SoundButton extends PowerButton {
             Context context = mView.getContext();
             mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
             mVibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            updateSettings(context.getContentResolver());
+            updateSettings();
         }
     }
 
     @Override
-    protected void updateState(Context context) {
-        findCurrentState(context);
+    protected void updateState() {
+        findCurrentState();
         switch (mRingersIndex) {
             case 0:
                 mIcon = R.drawable.stat_silent;
@@ -104,7 +104,7 @@ public class SoundButton extends PowerButton {
     }
 
     @Override
-    protected void toggleState(Context context) {
+    protected void toggleState() {
         mRingerValuesIndex++;
         if (mRingerValuesIndex > mRingerValues.length - 1) {
             mRingerValuesIndex = 0;
@@ -114,21 +114,21 @@ public class SoundButton extends PowerButton {
             mRingersIndex = 0;
         }
         Ringer ringer = mRingers[mRingersIndex];
-        ringer.execute(context);
+        ringer.execute();
     }
 
     @Override
-    protected boolean handleLongClick(Context context) {
+    protected boolean handleLongClick() {
         Intent intent = new Intent("android.settings.SOUND_SETTINGS");
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        mView.getContext().startActivity(intent);
         return true;
     }
 
     @Override
-    protected void onChangeUri(ContentResolver cr, Uri uri) {
-        updateSettings(cr);
+    protected void onChangeUri(Uri uri) {
+        updateSettings();
     }
 
     @Override
@@ -141,7 +141,9 @@ public class SoundButton extends PowerButton {
         return INTENT_FILTER;
     }
 
-    private void updateSettings(ContentResolver resolver) {
+    private void updateSettings() {
+        ContentResolver resolver = mView.getContext().getContentResolver();
+
         int expandedHapticFeedback = Settings.System.getInt(resolver,
                 Settings.System.EXPANDED_HAPTIC_FEEDBACK, 2);
         if (expandedHapticFeedback == 2) {
@@ -163,12 +165,13 @@ public class SoundButton extends PowerButton {
                 mRingerValues[i] = Integer.valueOf(modes[i]);
             }
         }
+
+        updateState();
     }
 
-    private void findCurrentState(Context context) {
-        ensureAudioManager(context);
-
-        boolean vibrateInSilent = Settings.System.getInt(context.getContentResolver(),
+    private void findCurrentState() {
+        ContentResolver resolver = mView.getContext().getContentResolver();
+        boolean vibrateInSilent = Settings.System.getInt(resolver,
                 Settings.System.VIBRATE_IN_SILENT, 0) == 1;
         int vibrateSetting = mAudioManager.getVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER);
         int ringerMode = mAudioManager.getRingerMode();
@@ -195,13 +198,8 @@ public class SoundButton extends PowerButton {
         }
     }
 
-    private void ensureAudioManager(Context context) {
-        if (mAudioManager == null) {
-            mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        }
-    }
-
     private class Ringer {
+
         final boolean mVibrateInSilent;
         final int mVibrateSetting;
         final int mRingerMode;
@@ -214,12 +212,10 @@ public class SoundButton extends PowerButton {
             mDoHapticFeedback = doHapticFeedback;
         }
 
-        void execute(Context context) {
-            ContentResolver resolver = context.getContentResolver();
+        void execute() {
+            ContentResolver resolver = mView.getContext().getContentResolver();
             Settings.System.putInt(resolver, Settings.System.VIBRATE_IN_SILENT,
                     (mVibrateInSilent ? 1 : 0));
-
-            ensureAudioManager(context);
             mAudioManager.setVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER, mVibrateSetting);
             mAudioManager.setRingerMode(mRingerMode);
             if (mDoHapticFeedback && mHapticFeedbackEnabled) {

@@ -20,8 +20,8 @@ public class MobileDataButton extends PowerButton {
     public MobileDataButton() { mType = BUTTON_MOBILEDATA; }
 
     @Override
-    protected void updateState(Context context) {
-        if (getDataState(context)) {
+    protected void updateState() {
+        if (getDataState(mView.getContext())) {
             mIcon = R.drawable.stat_data_on;
             mState = STATE_ENABLED;
         } else {
@@ -31,7 +31,8 @@ public class MobileDataButton extends PowerButton {
     }
 
     @Override
-    protected void toggleState(Context context) {
+    protected void toggleState() {
+        Context context = mView.getContext();
         boolean mobiledataEnabled = getDataState(context);
 
         boolean toggleNetworkMode = Settings.System.getInt(context.getContentResolver(),
@@ -61,13 +62,13 @@ public class MobileDataButton extends PowerButton {
     }
 
     @Override
-    protected boolean handleLongClick(Context context) {
+    protected boolean handleLongClick() {
         // it may be better to make an Intent action for this or find the appropriate one
         // we may want to look at that option later
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClassName("com.android.phone", "com.android.phone.Settings");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        mView.getContext().startActivity(intent);
         return true;
     }
 
@@ -78,7 +79,12 @@ public class MobileDataButton extends PowerButton {
         return filter;
     }
 
-    private boolean getDataState(Context context) {
+    private static boolean getDataRomingEnabled(Context context) {
+        return Settings.Secure.getInt(context.getContentResolver(),
+                Settings.Secure.DATA_ROAMING,0) > 0;
+    }
+
+    private static boolean getDataState(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context
             .getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getMobileDataEnabled();
