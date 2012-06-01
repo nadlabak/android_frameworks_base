@@ -11622,7 +11622,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         int N;
         if (app.processName.equals("com.android.mms") && (app.services.size() != 0
                 || Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.LOCK_MMS_IN_MEMORY, 1) == 1)) {
+                Settings.System.LOCK_MMS_IN_MEMORY, 0) == 1)) {
             // When SmsReceiverService is running, it does important work. So treat
             // Mms app as being in the foreground to prevent loss of messsages.
             // Or optionally lock the Mms app in memory all the time.
