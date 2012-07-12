@@ -3658,6 +3658,9 @@
   <eat-comment />
 
   <java-symbol type="string" name="config_legacyUmsLunFile" />
+
   <java-symbol type="bool" name="config_forceDisableHardwareKeyboard" />
+
+  <java-symbol type="array" name="config_vendorServices" />
 
 </resources>
