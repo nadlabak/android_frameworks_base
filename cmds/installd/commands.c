@@ -943,7 +943,7 @@ done:
 int linklib(const char* dataDir, const char* asecLibDir)
 {
     char libdir[PKG_PATH_MAX];
-    struct stat s, libStat;
+    struct stat s, libStat, libdirStat;
     int rc = 0;
 
     const size_t libdirLen = strlen(dataDir) + strlen(PKG_LIB_POSTFIX);
@@ -971,6 +971,12 @@ int linklib(const char* dataDir, const char* asecLibDir)
     }
 
     if (lstat(libdir, &libStat) < 0) {
+        ALOGE("couldn't lstat lib dir: %s\n", strerror(errno));
+        rc = -1;
+        goto out;
+    }
+
+    if (stat(libdir, &libdirStat) < 0) {
         ALOGE("couldn't stat lib dir: %s\n", strerror(errno));
         rc = -1;
         goto out;
@@ -982,6 +988,14 @@ int linklib(const char* dataDir, const char* asecLibDir)
             goto out;
         }
     } else if (S_ISLNK(libStat.st_mode)) {
+        /* TODO: find if there is a better way to check the symlink */
+        if ((libdirStat.st_mode & S_IWUSR) != 0) {
+        /* symlinked to eg. /sd-ext/lib/{...} by user or script */
+            if (delete_dir_contents(libdir, 0, 0) < 0) {
+               rc = -1;
+                goto out;
+            }
+        }
         if (unlink(libdir) < 0) {
             rc = -1;
             goto out;
@@ -1018,7 +1032,7 @@ out:
 int unlinklib(const char* dataDir)
 {
     char libdir[PKG_PATH_MAX];
-    struct stat s, libStat;
+    struct stat s, libStat, libdirStat;
     int rc = 0;
 
     const size_t libdirLen = strlen(dataDir) + strlen(PKG_LIB_POSTFIX);
@@ -1048,6 +1062,12 @@ int unlinklib(const char* dataDir)
     }
 
     if (lstat(libdir, &libStat) < 0) {
+        ALOGE("couldn't lstat lib dir: %s\n", strerror(errno));
+        rc = -1;
+        goto out;
+    }
+
+    if (stat(libdir, &libdirStat) < 0) {
         ALOGE("couldn't stat lib dir: %s\n", strerror(errno));
         rc = -1;
         goto out;
@@ -1059,9 +1079,21 @@ int unlinklib(const char* dataDir)
             goto out;
         }
     } else if (S_ISLNK(libStat.st_mode)) {
-        if (unlink(libdir) < 0) {
-            rc = -1;
+        /* TODO: find if there is a better way to check the symlink */
+        if ((libdirStat.st_mode & S_IWUSR) != 0) {
+        /* symlinked to eg. /sd-ext/lib/{...} by user or script */
+            if (delete_dir_contents(libdir, 0, 0) < 0) {
+                rc = -1;
+                goto out;
+            }
+            /* skip preparing lib dir */
             goto out;
+        } else {
+        /* symlinked to /mnt/asec/{...} by system */
+            if (unlink(libdir) < 0) {
+                rc = -1;
+               goto out;
+            }
         }
     }
 
@@ -1073,7 +1105,7 @@ int unlinklib(const char* dataDir)
 
     if (chown(libdir, AID_SYSTEM, AID_SYSTEM) < 0) {
         ALOGE("cannot chown dir '%s': %s\n", libdir, strerror(errno));
-        unlink(libdir);
+        rmdir(libdir);
         rc = -errno;
         goto out;
     }

@@ -3936,7 +3936,8 @@ public class PackageManagerService extends IPackageManager.Stub {
                         isSymLink = true;
                     }
                     if (isSymLink) {
-                        mInstaller.unlinkNativeLibraryDirectory(dataPathString);
+                        /* lib2ext is using symlinks, so let's preserve them */
+                        // mInstaller.unlinkNativeLibraryDirectory(dataPathString);
                     }
 
                     /*
