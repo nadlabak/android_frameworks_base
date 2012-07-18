@@ -410,6 +410,7 @@
     <!-- Contains a list of vendor specific services to start via ServiceManager.
          Format for each item is: <path_to_service_jar_file>:<service_class_name> -->
     <string-array name="config_vendorServices">
+    </string-array>
 
     <!-- Defines the shutdown options shown in the reboot dialog. -->
     <array name="shutdown_reboot_options" translatable="false">
