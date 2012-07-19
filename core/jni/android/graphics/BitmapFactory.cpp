@@ -17,6 +17,7 @@
 #include <android_runtime/AndroidRuntime.h>
 #include <androidfw/Asset.h>
 #include <androidfw/ResourceTypes.h>
+#include <cutils/properties.h>
 #include <netinet/in.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -44,6 +45,8 @@ jfieldID gBitmap_layoutBoundsFieldID;
 #endif
 
 using namespace android;
+
+bool mPurgeableAssets;
 
 static inline int32_t validOrNeg1(bool isValid, int32_t value) {
 //    return isValid ? value : -1;
@@ -478,7 +481,7 @@ static jobject nativeDecodeAssetScaled(JNIEnv* env, jobject clazz, jint native_a
 
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
-    bool forcePurgeable = optionsPurgeable(env, options);
+    bool forcePurgeable = optionsPurgeable(env, options) || mPurgeableAssets;
     if (forcePurgeable) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
         // and we could assume optionsShareable, since assets are always RO
@@ -603,6 +606,11 @@ int register_android_graphics_BitmapFactory(JNIEnv* env) {
     SkASSERT(bitmap_class);
     gBitmap_nativeBitmapFieldID = getFieldIDCheck(env, bitmap_class, "mNativeBitmap", "I");
     gBitmap_layoutBoundsFieldID = getFieldIDCheck(env, bitmap_class, "mLayoutBounds", "[I");
+
+    char value[PROPERTY_VALUE_MAX];
+    property_get("persist.sys.purgeable_assets", value, "0");
+    mPurgeableAssets = atoi(value) == 1;
+
     int ret = AndroidRuntime::registerNativeMethods(env,
                                     "android/graphics/BitmapFactory$Options",
                                     gOptionsMethods,
