@@ -554,17 +554,6 @@
     <integer-array name="config_autoBrightnessLcdBacklightValues">
     </integer-array>
 
-<<<<<<< HEAD
-=======
-    <!-- Flag indicating whether we should enable automatic brightness for
-         the button and keyboard backlights. -->
-    <bool name="config_autoBrightnessButtonKeyboard">true</bool>
-
-    <!-- Flag indicating whether the button and keyboard backlights need the light
-         sensor always enabled. -->
-    <bool name="config_alwaysEnableLightSensor">false</bool>
-
->>>>>>> 39a7a11... Some devices need light sensor enabled for kb and button backlight
     <!-- Array of output values for button backlight corresponding to the LUX values
          in the config_autoBrightnessLevels array.  This array should have size one greater
          than the size of the config_autoBrightnessLevels array.
@@ -902,6 +891,10 @@
     <!-- Flag indicating whether we should enable automatic brightness for
          the button and keyboard backlights. -->
     <bool name="config_autoBrightnessButtonKeyboard">true</bool>
+
+    <!-- Flag indicating whether the button and keyboard backlights need the light
+         sensor always enabled. -->
+    <bool name="config_alwaysEnableLightSensor">false</bool>
 
     <!-- Path to the library that contains a device specific key handler -->
     <string name="config_deviceKeyHandlerLib" translatable="false"></string>
