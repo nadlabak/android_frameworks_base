@@ -288,9 +288,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         final boolean hasKernelSupport = new File("/proc/net/xt_qtaguid/ctrl").exists();
         if (hasKernelSupport) {
             Slog.d(TAG, "enabling bandwidth control");
+            mBandwidthControlEnabled = true;
             try {
                 mConnector.execute("bandwidth", "enable");
-                mBandwidthControlEnabled = true;
             } catch (NativeDaemonConnectorException e) {
                 Log.wtf(TAG, "problem enabling bandwidth controls", e);
             }
