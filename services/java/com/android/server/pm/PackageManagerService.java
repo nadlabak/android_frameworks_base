@@ -25,6 +25,7 @@ import static android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
 import static com.android.internal.util.ArrayUtils.appendInt;
 import static com.android.internal.util.ArrayUtils.removeInt;
 import static libcore.io.OsConstants.S_ISLNK;
+import static libcore.io.OsConstants.S_ISDIR;
 
 import com.android.internal.app.IMediaContainerService;
 import com.android.internal.app.ResolverActivity;
@@ -3929,15 +3930,19 @@ public class PackageManagerService extends IPackageManager.Stub {
                      * a directory so we can copy to it afterwards.
                      */
                     boolean isSymLink;
+                    boolean isDirectory;
                     try {
                         isSymLink = S_ISLNK(Libcore.os.lstat(nativeLibraryDir.getPath()).st_mode);
+                        isDirectory = S_ISDIR(Libcore.os.stat(nativeLibraryDir.getPath()).st_mode);
                     } catch (ErrnoException e) {
                         // This shouldn't happen, but we'll fail-safe.
                         isSymLink = true;
+                        isDirectory = false;
                     }
-                    if (isSymLink) {
-                        /* lib2ext is using symlinks, so let's preserve them */
-                        // mInstaller.unlinkNativeLibraryDirectory(dataPathString);
+                    /* lib2ext is using symlinks, so let's preserve them if they actually point
+                       to an existing directory */
+                    if (isSymLink && !isDirectory) {
+                        mInstaller.unlinkNativeLibraryDirectory(dataPathString);
                     }
 
                     /*
