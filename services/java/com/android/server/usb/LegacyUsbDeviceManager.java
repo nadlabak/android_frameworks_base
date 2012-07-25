@@ -342,6 +342,14 @@ public class LegacyUsbDeviceManager extends UsbDeviceManager {
                         false, new AdbSettingsObserver());
                 }
 
+                mContentResolver.registerContentObserver(
+                    Settings.Secure.getUriFor(Settings.Secure.ADB_NOTIFY),
+                    false, new ContentObserver(null) {
+                        public void onChange(boolean selfChange) {
+                            updateAdbNotification();
+                        }
+                    });
+
                 // Watch for USB configuration changes
                 if (mHasUsbService) {
                     mContext.registerReceiver(mUsbReconfiguredReceiver,
@@ -632,7 +640,10 @@ public class LegacyUsbDeviceManager extends UsbDeviceManager {
             if (mNotificationManager == null) return;
             final int id = com.android.internal.R.string.adb_active_notification_title;
             if (mAdbEnabled && mConnected) {
-                if ("0".equals(SystemProperties.get("persist.adb.notify"))) return;
+                if ("0".equals(SystemProperties.get("persist.adb.notify"))
+                 || Settings.Secure.getInt(mContext.getContentResolver(),
+                    Settings.Secure.ADB_NOTIFY, 1) == 0)
+                    return;
 
                 if (!mAdbNotificationShown) {
                     Resources r = mContext.getResources();
