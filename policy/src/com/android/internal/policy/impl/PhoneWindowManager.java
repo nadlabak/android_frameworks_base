@@ -64,7 +64,6 @@ import android.os.Vibrator;
 import android.provider.Settings;
 
 import com.android.internal.R;
-import com.android.internal.app.ThemeUtils;
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.policy.PolicyManager;
 import com.android.internal.statusbar.IStatusBarService;
@@ -865,7 +864,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // Do the switch
             final AudioManager am = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
             final int ringerMode = am.getRingerMode();
-            final VolumePanel volumePanel = new VolumePanel(ThemeUtils.createUiContext(mContext),
+            final VolumePanel volumePanel = new VolumePanel(mContext,
                                                               (AudioService) getAudioService());
             if (ringerMode == AudioManager.RINGER_MODE_NORMAL) {
                 boolean vibrateSetting = am.getVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER)
