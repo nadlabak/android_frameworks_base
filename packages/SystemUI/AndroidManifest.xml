@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         package="com.android.systemui"
-        coreApp="true">
+        coreApp="true"
+        android:sharedUserId="android.uid.phone">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -62,6 +63,7 @@
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:label="@string/app_label"
+        android:process="com.android.phone"
         android:icon="@*android:drawable/platlogo">
 
         <!-- Broadcast receiver that gets the broadcast at boot time and starts
