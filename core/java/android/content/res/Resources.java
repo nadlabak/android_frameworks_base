@@ -1854,7 +1854,7 @@ public class Resources {
             flushLayoutCache();
         }
     }
-    
+
     /*package*/ Drawable loadDrawable(TypedValue value, int id)
             throws NotFoundException {
 
