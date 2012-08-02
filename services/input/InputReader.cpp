@@ -42,6 +42,7 @@
 #include "InputReader.h"
 
 #include <cutils/log.h>
+#include <cutils/properties.h>
 #include <androidfw/Keyboard.h>
 #include <androidfw/VirtualKeyMap.h>
 
@@ -100,10 +101,12 @@ static inline const char* toString(bool value) {
     return value ? "true" : "false";
 }
 
+static int mRotationMapStartIndex = 2;
+
 static int32_t rotateValueUsingRotationMap(int32_t value, int32_t orientation,
         const int32_t map[][4], size_t mapSize) {
     if (orientation != DISPLAY_ORIENTATION_0) {
-        for (size_t i = 0; i < mapSize; i++) {
+        for (size_t i = mRotationMapStartIndex; i < mapSize; i++) {
             if (value == map[i][0]) {
                 return map[i][orientation];
             }
@@ -115,6 +118,8 @@ static int32_t rotateValueUsingRotationMap(int32_t value, int32_t orientation,
 static const int32_t keyCodeRotationMap[][4] = {
         // key codes enumerated counter-clockwise with the original (unrotated) key first
         // no rotation,        90 degree rotation,  180 degree rotation, 270 degree rotation
+        { AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_UP },
+        { AKEYCODE_VOLUME_DOWN, AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_UP,   AKEYCODE_VOLUME_DOWN },
         { AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT },
         { AKEYCODE_DPAD_RIGHT,  AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN },
         { AKEYCODE_DPAD_UP,     AKEYCODE_DPAD_LEFT,   AKEYCODE_DPAD_DOWN,   AKEYCODE_DPAD_RIGHT },
@@ -245,7 +250,12 @@ InputReader::InputReader(const sp<EventHubInterface>& eventHub,
         mConfigurationChangesToRefresh(0) {
     mQueuedListener = new QueuedInputListener(listener);
 
-    { // acquire lock
+    {
+        char propValue[PROPERTY_VALUE_MAX];
+        property_get("persist.sys.volbtn_orient_swap", propValue, "0");
+        mRotationMapStartIndex = atoi(propValue) == 1 ? 0 : 2;
+
+     // acquire lock
         AutoMutex _l(mLock);
 
         refreshConfigurationLocked(0);
