@@ -215,7 +215,7 @@ public abstract class KeyguardViewBase extends FrameLayout {
                         }
                         // Volume buttons should only function for music (local or remote).
                         if (keyCode == KeyEvent.KEYCODE_VOLUME_MUTE) {
-                                mAudioManager.toggleMute(AudioManager.STREAM_MUSIC);
+                                mAudioManager.toggleGlobalMute();
                         } else {
                             mAudioManager.adjustLocalOrRemoteStreamVolume(
                                     AudioManager.STREAM_MUSIC,
