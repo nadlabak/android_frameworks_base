@@ -2220,7 +2220,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // Handle keyboard language switching.
         if (down && repeatCount == 0
-                && (keyCode == KeyEvent.KEYCODE_LANGUAGE_SWITCH
+                && ((keyCode == KeyEvent.KEYCODE_LANGUAGE_SWITCH
+                                && (metaState & KeyEvent.META_ALT_MASK) == 0)
                         || (keyCode == KeyEvent.KEYCODE_SPACE
                                 && (metaState & KeyEvent.META_CTRL_MASK) != 0))) {
             int direction = (metaState & KeyEvent.META_SHIFT_MASK) != 0 ? -1 : 1;
