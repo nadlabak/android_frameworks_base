@@ -2640,7 +2640,7 @@ public class PowerManagerService extends IPowerManager.Stub
             final int minval = values[0];
             final int maxval = values[mAutoBrightnessLevels.length];
             if (minval > maxval) {
-                // this is button or keyboard brightness where brightness
+                // this is a button or keyboard brightness where brightness
                 // is in reversed order to sensor values
                 return values[i];
             }
