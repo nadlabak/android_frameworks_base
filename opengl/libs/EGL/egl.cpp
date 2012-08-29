@@ -1021,20 +1021,6 @@ EGLSurface eglCreateWindowSurface(  EGLDisplay dpy, EGLConfig config,
                 iConfig, EGL_NATIVE_VISUAL_ID, &format)) {
             if (format != 0) {
                 native_window_set_buffers_geometry(window, 0, 0, format);
-            } else {
-                EGLint id,r,g,b,a,d=0;
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_CONFIG_ID, &id);
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_RED_SIZE, &r);
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_GREEN_SIZE, &g);
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_BLUE_SIZE, &b);
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_ALPHA_SIZE, &a);
-                cnx->egl.eglGetConfigAttrib(iDpy,iConfig, EGL_DEPTH_SIZE, &d);
-                LOGI("eglCreateWindowSurface - config %d: RGBA_%d%d%d%d Depth %x", id,r,g,b,a,d);
-                if (g == 8 && a == 8) {
-                    LOGW("eglCreateWindowSurface - set native window to RGBA_8888");
-                    // GGL_PIXEL_FORMAT_RGBA_8888 = 1
-                    native_window_set_buffers_geometry(window, 0, 0, 1);
-                }
             }
         }
 
