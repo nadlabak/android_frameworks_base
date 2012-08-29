@@ -1010,7 +1010,7 @@ EGLBoolean eglGetConfigAttrib(EGLDisplay dpy, EGLConfig config,
             *value = GGL_PIXEL_FORMAT_RGB_565;
             return EGL_TRUE;
         } else if (g == 8 && a == 8) {
-            *value = GGL_PIXEL_FORMAT_BGRA_8888;
+            *value = GGL_PIXEL_FORMAT_RGBA_8888;
             return EGL_TRUE;
         } else if (g == 0 && a == 8) {
             *value = GGL_PIXEL_FORMAT_A_8;
