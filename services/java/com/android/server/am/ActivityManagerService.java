@@ -355,7 +355,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     static boolean GMAPS_HACK;
     static final String GMAPS_NLS = 
-            "com.google.android.apps.maps/com.google.android.location.internal.server.NetworkLocationService";
+            "com.google.android.apps.maps/com.google.android.location.internal.server.GoogleLocationService";
     
     static int getIntProp(String name, boolean allowZero) {
         String str = SystemProperties.get(name);
