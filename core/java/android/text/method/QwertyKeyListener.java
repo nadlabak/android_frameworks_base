@@ -92,6 +92,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.delete('\u043e');
             MP_SETS.delete('\u044c');
             MP_SETS.delete('\u042c');
+            MP_SETS.delete('\u043f');
+            MP_SETS.delete('\u041f');
             MP_SETS.put('\u0439', "\u0446");
             MP_SETS.put('\u0419', "\u0426");
             MP_SETS.put('\u044f', "\u0447");
@@ -118,6 +120,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.delete('\u043e');
             MP_SETS.delete('\u044c');
             MP_SETS.delete('\u042c');
+            MP_SETS.delete('\u043f');
+            MP_SETS.delete('\u041f');
             MP_SETS.put('\u0439', "\u0446");
             MP_SETS.put('\u0419', "\u0426");
             MP_SETS.put('\u0444', "\u044b");
@@ -143,6 +147,8 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.delete('\u0425');
             MP_SETS.delete('\u044e');
             MP_SETS.delete('\u042e');
+            MP_SETS.delete('\u043f');
+            MP_SETS.delete('\u041f');
             MP_SETS.put('\u0446', "\u0447");
             MP_SETS.put('\u0426', "\u0427");
             MP_SETS.put('\u0448', "\u0449");
@@ -157,6 +163,35 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('\u043e', "\u0451");
             MP_SETS.put('\u044c', "\u044a");
             MP_SETS.put('\u042c', "\u042a");
+        } else if (currentKeycharmap.contains("bulgarian")) {
+            MP_SETS.delete('\u0437');
+            MP_SETS.delete('\u0417');
+            MP_SETS.delete('\u0448');
+            MP_SETS.delete('\u0428');
+            MP_SETS.delete('\u0430');
+            MP_SETS.delete('\u0410');
+            MP_SETS.delete('\u0435');
+            MP_SETS.delete('\u0415');
+            MP_SETS.delete('\u0436');
+            MP_SETS.delete('\u0416');
+            MP_SETS.delete('\u0444');
+            MP_SETS.delete('\u0424');
+            MP_SETS.delete('\u0439');
+            MP_SETS.delete('\u0419');
+            MP_SETS.delete('\u0445');
+            MP_SETS.delete('\u0425');
+            MP_SETS.delete('\u044e');
+            MP_SETS.delete('\u042e');
+            MP_SETS.put('\u044c', "\u045d"); //ь-ѝ (x)
+            MP_SETS.put('\u042c', "\u040d"); //Ь-Ѝ (X)
+            MP_SETS.put('\u044f', "\u044e"); //я-ю (q)
+            MP_SETS.put('\u042f', "\u042e"); //Я-Ю (Q)
+            MP_SETS.put('\u0446', "\u0447"); //ц-ч (c)
+            MP_SETS.put('\u0426', "\u0427"); //Ц-Ч (C)
+            MP_SETS.put('\u043e', "\u0448"); //о-ш (o)
+            MP_SETS.put('\u041e', "\u0428"); //О-Ш (O)
+            MP_SETS.put('\u043f', "\u0449"); //п-щ (p)
+            MP_SETS.put('\u041f', "\u0429"); //П-Щ (P)
         }
     }
 
