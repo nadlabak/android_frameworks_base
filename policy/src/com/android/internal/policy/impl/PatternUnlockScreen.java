@@ -36,7 +36,7 @@ import com.android.internal.widget.LockPatternView.Cell;
 import java.util.List;
 
 /**
- * This is the screen that shows the 9 circle unlock widget and instructs
+ * This is the screen that shows the circle unlock widget and instructs
  * the user how to unlock their device, or make an emergency call.
  */
 class PatternUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
@@ -188,16 +188,23 @@ class PatternUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
         mLockPatternView.setFocusable(false);
         mLockPatternView.setOnPatternListener(new UnlockPatternListener());
 
+        mLockPatternView.setVisibleDots(mLockPatternUtils.isVisibleDotsEnabled());
+        mLockPatternView.setShowErrorPath(mLockPatternUtils.isShowErrorPath());
+
         // stealth mode will be the same for the life of this screen
         mLockPatternView.setInStealthMode(!mLockPatternUtils.isVisiblePatternEnabled());
 
         // vibrate mode will be the same for the life of this screen
         mLockPatternView.setTactileFeedbackEnabled(mLockPatternUtils.isTactileFeedbackEnabled());
 
+        mLockPatternView.setLockPatternSize(mLockPatternUtils.getLockPatternSize());
+
         // assume normal footer mode for now
         updateFooter(FooterMode.Normal);
 
         setFocusableInTouchMode(true);
+
+        mLockPatternUtils.updateLockPatternSize();
     }
 
     public void setEnableFallback(boolean state) {
@@ -345,6 +352,7 @@ class PatternUnlockScreen extends LinearLayoutWithDefaultTouchRecepient
         }
 
         public void onPatternDetected(List<LockPatternView.Cell> pattern) {
+            mLockPatternUtils.updateLockPatternSize();
             if (mLockPatternUtils.checkPattern(pattern)) {
                 mLockPatternView
                         .setDisplayMode(LockPatternView.DisplayMode.Correct);

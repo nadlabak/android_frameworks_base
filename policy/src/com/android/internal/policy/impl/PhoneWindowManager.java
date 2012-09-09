@@ -526,6 +526,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private int mPressOnAppSwitchBehavior = -1;
     private int mLongPressOnAppSwitchBehavior = -1;
 
+    private boolean mHomePressed;
+
     // To identify simulated keypresses, so we can perform
     // the default action for that key
     private boolean mIsVirtualKeypress;
@@ -603,6 +605,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     dispatchMediaKeyRepeatWithWakeLock((KeyEvent)msg.obj);
                     break;
                 case MSG_DISPATCH_VOLKEY_WITH_WAKE_LOCK:
+                    mIsLongPress = true;
                     dispatchMediaKeyWithWakeLockToAudioService((KeyEvent)msg.obj);
                     dispatchMediaKeyWithWakeLockToAudioService(KeyEvent.changeAction((KeyEvent)msg.obj, KeyEvent.ACTION_UP));
                     break;
@@ -877,8 +880,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             final VolumePanel volumePanel = new VolumePanel(mContext,
                                                               (AudioService) getAudioService());
             if (ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                boolean vibrateSetting = am.getVibrateSetting(AudioManager.VIBRATE_TYPE_RINGER)
-                                           == AudioManager.VIBRATE_SETTING_ON;
+                boolean vibrateSetting = Settings.System.getInt(mContext.getContentResolver(),
+                                           Settings.System.VIBRATE_WHEN_RINGING, 0) != 0;
                 am.setRingerMode(vibrateSetting ? AudioManager.RINGER_MODE_VIBRATE :
                                    AudioManager.RINGER_MODE_SILENT);
             } else {
@@ -2103,9 +2106,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
             // If we have released the home key, and didn't do anything else
             // while it was pressed, then it is time to go home!
-            if (!down) {
+            if (!down && mHomePressed) {
                 final boolean homeWasLongPressed = mHomeLongPressed;
                 mHomeLongPressed = false;
+                mHomePressed = false;
                 if (!homeWasLongPressed) {
                     if (mRecentAppsPreloaded) {
                         cancelPreloadRecentApps();
@@ -2156,10 +2160,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
             }
             if (down) {
-                if (!mRecentAppsPreloaded && mLongPressOnHomeBehavior == KEY_ACTION_APP_SWITCH) {
-                    preloadRecentApps();
-                }
-                if (longPress) {
+                if (repeatCount == 0) {
+                    mHomePressed = true;
+                    if (!mRecentAppsPreloaded && mLongPressOnHomeBehavior == KEY_ACTION_APP_SWITCH) {
+                        preloadRecentApps();
+                    }
+                } else if (longPress) {
                     if (!keyguardOn && mLongPressOnHomeBehavior != KEY_ACTION_NOTHING) {
                         performHapticFeedbackLw(null, HapticFeedbackConstants.LONG_PRESS, false);
                         performKeyAction(mLongPressOnHomeBehavior);
