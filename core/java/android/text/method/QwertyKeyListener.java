@@ -163,7 +163,7 @@ public class QwertyKeyListener extends BaseKeyListener {
             MP_SETS.put('\u043e', "\u0451");
             MP_SETS.put('\u044c', "\u044a");
             MP_SETS.put('\u042c', "\u042a");
-        } else if (currentKeycharmap.contains("bulgarian")) {
+        } else if (currentKeycharmap.contains("bg_phonetic")) {
             MP_SETS.delete('\u0437');
             MP_SETS.delete('\u0417');
             MP_SETS.delete('\u0448');
