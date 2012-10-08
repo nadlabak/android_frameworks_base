@@ -234,6 +234,8 @@
     <string name="permlab_readCellBroadcasts" msgid="1598328843619646166">"hücre yayını mesajlarını oku"</string>
     <string name="permdesc_readCellBroadcasts" msgid="6361972776080458979">"Uygulamaya, cihazınız tarafından alınan hücre yayını mesajlarını okuma izni verir. Hücre yayını uyarıları bazı yerlerde acil durumlar konusunda sizi uyarmak için gönderilir. Kötü amaçlı uygulamalar acil hücre yayını alındığında cihazınızın performansına ya da çalışmasına engel olabilir."</string>
     <string name="permlab_sendSms" msgid="5600830612147671529">"SMS mesajları gönder"</string>
+    <string name="permlab_sendMockSms">Sahte SMS gönder</string>
+    <string name="permdesc_sendMockSms">Uygulamanın sahte SMS göndermesine izin verir. Bir uygulamanın güvenilir uygulamalara SMS göndermesine izin verir. Zararlı uygulamalar, aygıtın bildirim sistemini engelleyip kullanıcıyı rahatsız ederek sürekli mesaj gönderebilir.</string>
     <string name="permdesc_sendSms" msgid="7094729298204937667">"Uygulamaya SMS mesajları gönderme izni verir. Bu durum beklenmeyen ödemelere neden olabilir. Kötü amaçlı uygulamalar onayınız olmadan mesajlar göndererek sizi zarara uğratabilir."</string>
     <string name="permlab_sendSmsNoConfirmation" msgid="4781483105951730228">"SMS mesajlarını onaysız gönder"</string>
     <string name="permdesc_sendSmsNoConfirmation" msgid="402569800862935907">"Uygulamaya SMS mesajları gönderme izni verir. Bu durum beklenmeyen ödemelere neden olabilir. Kötü amaçlı uygulamalar onayınız olmadan mesajlar göndererek sizi zarara uğratabilir."</string>
@@ -979,8 +981,10 @@
     <string name="no" msgid="5141531044935541497">"İptal"</string>
     <string name="dialog_alert_title" msgid="2049658708609043103">"Dikkat"</string>
     <string name="loading" msgid="7933681260296021180">"Yükleniyor..."</string>
-    <string name="capital_on" msgid="1544682755514494298">"AÇIK"</string>
-    <string name="capital_off" msgid="6815870386972805832">"KAPALI"</string>
+    <string name="capital_on" product="tablet">"AÇIK"</string>
+    <string name="capital_off" product="tablet">"KAPALI"</string>
+    <string name="capital_on" product="default">"AÇK"</string>
+    <string name="capital_off" product="default">"KPL"</string>
     <string name="whichApplication" msgid="4533185947064773386">"İşlemi şunu kullanarak tamamla"</string>
     <string name="alwaysUse" msgid="4583018368000610438">"Varsayılan olarak bu işlem için kullan."</string>
     <string name="clearDefaultHintMsg" msgid="3252584689512077257">"Sistem ayarları &gt; Uygulamalar &gt; İndirilen bölümünden varsayılanı temizleyin."</string>
@@ -1283,7 +1287,7 @@
     <string name="storage_internal" msgid="4891916833657929263">"Dahili depolama birimi"</string>
     <string name="storage_sd_card" msgid="3282948861378286745">"SD kart"</string>
     <!-- #CM-MOD-START -->
-    <string name="storage_sd_dock_card">SD Kard Kiti</string>
+    <string name="storage_sd_dock_card">SD Kart Kiti</string>
     <!-- #CM-MOD-END -->
     <string name="storage_usb" msgid="3017954059538517278">"USB bellek"</string>
     <string name="extract_edit_menu_button" msgid="8940478730496610137">"Düzenle"</string>
