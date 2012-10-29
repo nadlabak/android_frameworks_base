@@ -492,7 +492,7 @@ static jobject nativeDecodeAssetScaled(JNIEnv* env, jobject clazz, jint native_a
 
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
-    bool forcePurgeable = optionsPurgeable(env, options) || mPurgeableAssets;
+    bool forcePurgeable = optionsPurgeable(env, options) || (mPurgeableAssets && !applyScale);
     if (forcePurgeable) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
         // and we could assume optionsShareable, since assets are always RO
