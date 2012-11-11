@@ -40,7 +40,7 @@ public class BitmapFactory {
          * the same result from the decoder as if null were passed.
          */
         public Options() {
-            inDither = false;
+            inDither = true;
             inScaled = true;
         }
 
@@ -99,11 +99,8 @@ public class BitmapFactory {
          * the decoder will try to pick the best matching config based on the
          * system's screen depth, and characteristics of the original image such
          * as if it has per-pixel alpha (requiring a config that also does).
-         * 
-         * Image are loaded with the {@link Bitmap.Config#ARGB_8888} config by
-         * default.
          */
-        public Bitmap.Config inPreferredConfig = Bitmap.Config.ARGB_8888;
+        public Bitmap.Config inPreferredConfig;
 
         /**
          * If dither is true, the decoder will attempt to dither the decoded

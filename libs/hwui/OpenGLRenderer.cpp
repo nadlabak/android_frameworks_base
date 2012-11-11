@@ -159,7 +159,7 @@ void OpenGLRenderer::setViewport(int width, int height) {
     mFirstSnapshot->height = height;
     mFirstSnapshot->viewport.set(0, 0, width, height);
 
-    glDisable(GL_DITHER);
+//    glDisable(GL_DITHER);
     glEnable(GL_SCISSOR_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
