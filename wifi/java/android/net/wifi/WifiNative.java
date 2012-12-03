@@ -274,6 +274,17 @@ public class WifiNative {
             && doBooleanCommand("DRIVER RXFILTER-START");
     }
 
+    /**
+     * Set the initial state of Rx filters.
+     * @return {@code true} if the operation succeeded, {@code false} otherwise
+     */
+    public boolean initializeRxFilters() {
+        return doBooleanCommand("DRIVER RXFILTER-ADD 0")
+            && doBooleanCommand("DRIVER RXFILTER-ADD 1")
+            && doBooleanCommand("DRIVER RXFILTER-ADD 2")
+            && doBooleanCommand("DRIVER RXFILTER-START");
+    }
+
     public int getBand() {
        String ret = doStringCommand("DRIVER GETBAND");
         if (!TextUtils.isEmpty(ret)) {
