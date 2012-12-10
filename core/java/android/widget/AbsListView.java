@@ -1594,7 +1594,6 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
             clearScrollingCache();
         }
         mScrollingCacheEnabled = enabled;
-        Log.d(ViewDebug.CONSISTENCY_LOG_TAG, "AbsListView " + this + " enabled= " + enabled);
     }
 
     /**
