@@ -19,6 +19,7 @@ package android.graphics;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 
 import java.io.BufferedInputStream;
@@ -335,6 +336,7 @@ public class BitmapFactory {
         }
 
         if (opts.inDensity == 0 && value != null) {
+            Log.d("BitmapFactory","decodeResourceStream: value " + value.toString());
             final int density = value.density;
             if (density == TypedValue.DENSITY_DEFAULT) {
                 opts.inDensity = DisplayMetrics.DENSITY_DEFAULT;
@@ -346,7 +348,7 @@ public class BitmapFactory {
         if (opts.inTargetDensity == 0 && res != null) {
             opts.inTargetDensity = res.getDisplayMetrics().densityDpi;
         }
-        
+        Log.d("BitmapFactory","decodeResourceStream: inDensity " + opts.inDensity + " inTargetDensity " + opts.inTargetDensity);
         return decodeStream(is, pad, opts);
     }
 
@@ -364,8 +366,8 @@ public class BitmapFactory {
      */
     public static Bitmap decodeResource(Resources res, int id, Options opts) {
         Bitmap bm = null;
-        InputStream is = null; 
-        
+        InputStream is = null;
+
         try {
             final TypedValue value = new TypedValue();
             is = res.openRawResource(id, value);

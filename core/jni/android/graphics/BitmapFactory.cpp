@@ -17,6 +17,7 @@
 #include <android_runtime/AndroidRuntime.h>
 #include <cutils/properties.h>
 #include <utils/Asset.h>
+#include <utils/Log.h>
 #include <utils/ResourceTypes.h>
 #include <netinet/in.h>
 #include <sys/mman.h>
@@ -256,9 +257,11 @@ static jobject doDecode(JNIEnv* env, SkStream* stream, jobject padding,
     }
     SkAutoTDelete<SkBitmap> adb2(willScale ? decoded : NULL);
 
+    LOGD("do_decode: scale before decoder->decode is %f \n", scale);
     if (!decoder->decode(stream, decoded, prefConfig, decodeMode, javaBitmap != NULL)) {
         return nullObjectReturn("decoder->decode returned false");
     }
+    LOGD("do_decode: scale after decoder->decode is %f \n", scale);
 
     int scaledWidth = decoded->width();
     int scaledHeight = decoded->height();
@@ -324,7 +327,9 @@ static jobject doDecode(JNIEnv* env, SkStream* stream, jobject padding,
 
         bitmap->setConfig(config, scaledWidth, scaledHeight);
         bitmap->setIsOpaque(decoded->isOpaque());
-        bitmap->allocPixels(&javaAllocator, NULL);
+        if (!bitmap->allocPixels(&javaAllocator, NULL)){
+            return nullObjectReturn("allocation failed for scaled bitmap");
+        }
         bitmap->eraseColor(0);
 
         SkPaint paint;
@@ -473,6 +478,7 @@ static jobject nativeDecodeAssetScaled(JNIEnv* env, jobject clazz, jint native_a
 
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
+    LOGD("nativeDecodeAssetScaled: scale is %f \n", scale);
     bool forcePurgeable = optionsPurgeable(env, options) || (mPurgeableAssets && !applyScale);
     if (forcePurgeable) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
