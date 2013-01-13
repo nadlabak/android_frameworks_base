@@ -5028,7 +5028,7 @@ status_t OMXCodec::read(
 
 #else
     while (mState != ERROR && !mNoMoreOutputData && mFilledBuffers.empty()) {
-        wait_status = mBufferFilled.waitRelative(mLock, 3000000000);
+        wait_status = mIsEncoder ? mBufferFilled.wait(mLock) : mBufferFilled.waitRelative(mLock, 3000000000);
         if (wait_status) {
             LOGE("Timed out waiting for the buffer! Line %d", __LINE__);
             return UNKNOWN_ERROR;
