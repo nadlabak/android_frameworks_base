@@ -18,12 +18,14 @@ package com.android.internal.telephony;
 
 import android.content.Context;
 import android.os.AsyncResult;
+import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
 import android.util.Log;
 
 import com.android.internal.telephony.DataCallState;
+import static com.android.internal.telephony.RILConstants.GENERIC_FAILURE;
 import static com.android.internal.telephony.RILConstants.RIL_REQUEST_SETUP_DATA_CALL;
 import com.android.internal.telephony.gsm.NetworkInfo;
 import com.android.internal.telephony.gsm.SuppServiceNotification;
@@ -41,6 +43,36 @@ public class MotoWrigley3GRIL extends RIL {
 
     private int mDataConnectionCount = -1;
     private RILRequest mSetupDataCallRequest;
+    private Boolean mRadioShouldBeOn;
+    private DataCallRecoveryState mRecoveryState = DataCallRecoveryState.IDLE;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_RECOVERY_POWERDOWN:
+                    Log.d(TAG, "SETUP_DATA_CALL recovery: powered down radio, should be on = " + mRadioShouldBeOn);
+                    if (mRadioShouldBeOn != null && mRadioShouldBeOn) {
+                        MotoWrigley3GRIL.super.setRadioPower(true, obtainMessage(MSG_RECOVERY_POWERUP));
+                        break;
+                    }
+                    /* else fall through */
+                case MSG_RECOVERY_POWERUP:
+                    Log.d(TAG, "SETUP_DATA_CALL recovery: powered up radio");
+                    mRecoveryState = DataCallRecoveryState.DONE;
+                    break;
+            }
+        }
+    };
+
+    private static enum DataCallRecoveryState {
+        IDLE,
+        ACTIVE,
+        DONE
+    };
+
+    private static final int MSG_RECOVERY_POWERDOWN = 1;
+    private static final int MSG_RECOVERY_POWERUP = 2;
 
     public MotoWrigley3GRIL(Context context) {
         super(context);
@@ -64,6 +96,23 @@ public class MotoWrigley3GRIL extends RIL {
             mSetupDataCallRequest = null;
         }
         return rr;
+    }
+
+    @Override
+    protected void
+    handleProcessedSolicitedResponse(RILRequest rr, int error, Object ret) {
+        if (rr.mRequest == RIL_REQUEST_SETUP_DATA_CALL) {
+            if (error == GENERIC_FAILURE && mRecoveryState == DataCallRecoveryState.IDLE) {
+                Log.w(TAG, "Got GENERIC_FAILURE error for SETUP_DATA_CALL command, attempting recovery...");
+                mRecoveryState = DataCallRecoveryState.ACTIVE;
+                super.setRadioPower(false, mHandler.obtainMessage(MSG_RECOVERY_POWERDOWN));
+            } else if (error == 0 && mRecoveryState == DataCallRecoveryState.DONE) {
+                Log.d(TAG, "SETUP_DATA_CALL GENERIC_FAILURE recovery successful.");
+                mRecoveryState = DataCallRecoveryState.IDLE;
+            }
+        }
+
+        super.handleProcessedSolicitedResponse(rr, error, ret);
     }
 
     @Override
@@ -137,6 +186,22 @@ public class MotoWrigley3GRIL extends RIL {
         } else {
             super.deactivateDataCall(cid, result);
         }
+    }
+
+    @Override
+    public void
+    setRadioPower(boolean power, Message result) {
+        mRadioShouldBeOn = power;
+        super.setRadioPower(power, result);
+    }
+
+    @Override
+    protected void switchToRadioState(RadioState newState) {
+        Log.d(TAG, "switchToRadioState, old = " + mState + " new = " + newState);
+        if (mInitialRadioStateChange) {
+            mRadioShouldBeOn = newState != RadioState.RADIO_OFF;
+        }
+        super.switchToRadioState(newState);
     }
 
     class RILSender extends RIL.RILSender {
